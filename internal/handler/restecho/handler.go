@@ -40,3 +40,35 @@ func RegisterUserGroupAPI(e *echo.Echo, conf config.Config) {
 	apiUser.PUT("/u/:id", cont.UpdateUserController, middleware.JWT([]byte(conf.JWT_KEY)))
 	apiUser.DELETE("/u/:id", cont.DeleteUserController, middleware.JWT([]byte(conf.JWT_KEY)))
 }
+
+func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
+	db := database.InitDB(conf)
+	repo := repository.NewCourseRepository(db)
+
+	svc := service.NewCourseService(repo)
+
+	cont := CourseController{
+		service: svc,
+	}
+
+	authCourse := e.Group("/course",
+		middleware.Logger(),
+		middleware.CORS(),
+		m.APIKEYMiddleware,
+	)
+
+	authCourse.Use(middleware.JWT([]byte(conf.JWT_KEY)))
+
+	//authcourse handler
+	authCourse.POST("/create", cont.CreateCourse)
+	authCourse.PUT("/edit/:id", cont.EditCourse)
+	authCourse.DELETE("/delete/:id", cont.DeleteCourse)
+
+	courseGroup := e.Group("/course",
+		middleware.Logger(),
+		middleware.CORS(),
+	)
+	//course handler
+	courseGroup.GET("/all", cont.GetCourses)
+	courseGroup.GET("/:id", cont.GetCourse)
+}
