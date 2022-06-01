@@ -27,7 +27,7 @@ func (cr *courseRepoLayer) Delete(id int) error {
 
 // Update implements domain.CourseRepository
 func (cr *courseRepoLayer) Update(id int, course model.Course) error {
-	res := cr.DB.Where("id = ?", id).UpdateColumns(&course)
+	res := cr.DB.Where("course_id = ?", id).UpdateColumns(&course)
 	if res.RowsAffected < 1 {
 		return fmt.Errorf("error update data")
 	}
@@ -44,7 +44,7 @@ func (cr *courseRepoLayer) GetAll() []model.Course {
 
 // GetByID implements domain.CourseRepository
 func (cr *courseRepoLayer) GetByID(id int) (course model.Course, err error) {
-	res := cr.DB.Where("id = ?", id).First(&course)
+	res := cr.DB.Where("course_id = ?", id).First(&course)
 	if res.RowsAffected < 1 {
 		err = fmt.Errorf("not found")
 	}

@@ -17,10 +17,9 @@ type CourseController struct {
 func (cc *CourseController) CreateCourse(c echo.Context) error {
 	course := model.Course{}
 
+	c.Bind(&course)
 	bearer := c.Get("user").(*jwt.Token)
 	claim := bearer.Claims.(jwt.MapClaims)
-
-	c.Bind(&course)
 	course.MentorID = int(claim["id"].(float64))
 
 	rescode, err := cc.service.Store(course)
@@ -52,11 +51,11 @@ func (cc *CourseController) EditCourse(c echo.Context) error {
 			"messages": "no id or no change or unauthorization",
 		})
 	}
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"messages":          "edited",
-		"id":                id,
-		"mentor id":         course.MentorID,
-		"expeted mentor id": claim["id"],
+		"messages":  "edited",
+		"id":        id,
+		"mentor id": claim["id"],
 	})
 }
 
@@ -69,9 +68,9 @@ func (cc *CourseController) DeleteCourse(c echo.Context) error {
 	err := cc.service.Delete(id, int(claim["id"].(float64)))
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"messages": err.Error(),
-			"status":   http.StatusInternalServerError,
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": "cannot delete course | no id | unauthorized",
+			"status":   http.StatusNotFound,
 		})
 	}
 

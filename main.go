@@ -11,6 +11,7 @@ func main() {
 	e := echo.New()
 
 	rest.RegisterUserGroupAPI(e, config)
+	rest.RegisterCourseGroupAPI(e, config)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
