@@ -18,6 +18,7 @@ type EchoController struct {
 func (ce *EchoController) CreateUserController(c echo.Context) error {
 	user := model.User{}
 	c.Bind(&user)
+	user.RoleID = 2
 
 	err, statusCode := ce.svc.CreateUserService(user)
 
