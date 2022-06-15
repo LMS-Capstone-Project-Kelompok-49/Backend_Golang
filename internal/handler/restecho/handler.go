@@ -72,3 +72,35 @@ func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
 	courseGroup.GET("/all", cont.GetCourses)
 	courseGroup.GET("/:id", cont.GetCourse)
 }
+
+func RegisterRoleGroupAPI(e *echo.Echo, conf config.Config) {
+	db := database.InitDB(conf)
+	repo := repository.NewRoleRepository(db)
+
+	svc := service.NewRoleService(repo)
+
+	cont := RoleController{
+		service: svc,
+	}
+
+	authRole := e.Group("/role",
+		middleware.Logger(),
+		middleware.CORS(),
+		m.APIKEYMiddleware,
+	)
+
+	authRole.Use(middleware.JWT([]byte(conf.JWT_KEY)))
+
+	//authRole handler
+	authRole.POST("/create", cont.CreateRole)
+	authRole.PUT("/edit/:id", cont.EditRole)
+	authRole.DELETE("/delete/:id", cont.DeleteRole)
+
+	roleGroup := e.Group("/course",
+		middleware.Logger(),
+		middleware.CORS(),
+	)
+	//role handler
+	roleGroup.GET("/:id", cont.GetRole)
+
+}

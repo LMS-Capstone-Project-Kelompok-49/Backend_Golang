@@ -12,6 +12,7 @@ func main() {
 
 	rest.RegisterUserGroupAPI(e, config)
 	rest.RegisterCourseGroupAPI(e, config)
+	rest.RegisterRoleGroupAPI(e, config)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
