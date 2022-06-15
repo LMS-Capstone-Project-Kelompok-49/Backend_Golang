@@ -22,7 +22,7 @@ func (rs *roleService) Edit(id int, role model.Role) error {
 	return rs.repo.Update(id, role)
 }
 
-// GetOneCourse implements domain.RoleService
+// GetOneRole implements domain.RoleService
 func (rs *roleService) GetOneRole(id int) (model.Role, error) {
 	return rs.repo.GetByID(id)
 }

@@ -36,7 +36,7 @@ func (rr *roleRepoLayer) Delete(id int) error {
 
 // GetByID implements domain.RoleRepository
 func (rr *roleRepoLayer) GetByID(id int) (role model.Role, err error) {
-	res := rr.DB.Where("course_id = ?", id).First(&role)
+	res := rr.DB.Where("role_id = ?", id).First(&role)
 	if res.RowsAffected < 1 {
 		err = fmt.Errorf("not found")
 	}
