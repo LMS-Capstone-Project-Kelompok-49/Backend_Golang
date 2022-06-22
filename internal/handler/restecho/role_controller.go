@@ -89,7 +89,7 @@ func (rc *RoleController) DeleteRole(c echo.Context) error {
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
-			"messages": "cannot delete course | no id | unauthorized",
+			"messages": "cannot delete role | no id | unauthorized",
 			"status":   http.StatusNotFound,
 		})
 	}
