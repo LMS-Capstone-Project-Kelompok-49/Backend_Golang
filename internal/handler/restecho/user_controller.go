@@ -15,9 +15,19 @@ type EchoController struct {
 	svc domain.UserAdapterService
 }
 
+// Get one godoc
+// @Summary Create content
+// @description create content with data
+// @Security BearerAuth
+// @tags content
+// @Accept json
+// @Produce json
+// @Success 200 {object} content.Content
+// @Router /app/u [get]
 func (ce *EchoController) CreateUserController(c echo.Context) error {
 	user := model.User{}
 	c.Bind(&user)
+	user.RoleID = 2
 
 	err, statusCode := ce.svc.CreateUserService(user)
 
@@ -94,6 +104,16 @@ func (ce *EchoController) GetUserController(c echo.Context) error {
 		"users":    res,
 	})
 }
+
+// Create godoc
+// @Summary Create content
+// @description create content with data
+// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
+// @tags content
+// @Accept json
+// @Produce json
+// @Success 200 {object} content.Content
+// @Router /app [post]
 
 func (ce *EchoController) GetUsersController(c echo.Context) error {
 	users := ce.svc.GetAllUsersService()
