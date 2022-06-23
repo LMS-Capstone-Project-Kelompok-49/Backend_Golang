@@ -11,12 +11,18 @@ require (
 )
 
 require (
+	github.com/go-openapi/spec v0.20.6 // indirect
+	github.com/go-openapi/swag v0.21.1 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/minio/minio-go/v7 v7.0.29
-	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
+	github.com/swaggo/echo-swagger v1.3.3
+	github.com/swaggo/swag v1.8.2
+	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/net v0.0.0-20220614195744-fb05da6f9022 // indirect
 	golang.org/x/sys v0.0.0-20220614162138-6c1b26c55098 // indirect
+	golang.org/x/tools v0.1.11 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )

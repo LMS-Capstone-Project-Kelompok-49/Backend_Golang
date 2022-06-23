@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/domain"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/model"
@@ -16,8 +17,9 @@ type courseService struct {
 // Delete implements domain.CourseService
 func (cs *courseService) Delete(id int, idToken int) error {
 	usr, _ := cs.repo.GetByID(id)
+	d, _ := strconv.Atoi(usr.MentorID)
 
-	if usr.MentorID != idToken {
+	if d != idToken {
 		return fmt.Errorf("error")
 	}
 	return cs.repo.Delete(id)
@@ -26,7 +28,8 @@ func (cs *courseService) Delete(id int, idToken int) error {
 // Edit implements domain.CourseService
 func (cs *courseService) Edit(id int, idToken int, course model.Course) error {
 	usr, _ := cs.repo.GetByID(id)
-	if usr.MentorID != idToken {
+	d, _ := strconv.Atoi(usr.MentorID)
+	if d != idToken {
 		return fmt.Errorf("error")
 	}
 	return cs.repo.Update(id, course)

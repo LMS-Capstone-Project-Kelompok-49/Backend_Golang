@@ -6,7 +6,6 @@ import (
 
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/config"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/database"
-	m "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/middleware"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/repository"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/service"
 )
@@ -28,7 +27,6 @@ func RegisterUserGroupAPI(e *echo.Echo, conf config.Config) {
 	apiUser := e.Group("/app",
 		middleware.Logger(),
 		middleware.CORS(),
-		m.APIKEYMiddleware,
 	)
 	// Auth Handler
 	auth.POST("/login", cont.LoginUserController)
@@ -51,26 +49,25 @@ func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
 		service: svc,
 	}
 
-	authCourse := e.Group("/course",
+	authCourse := e.Group("/app",
 		middleware.Logger(),
 		middleware.CORS(),
-		m.APIKEYMiddleware,
 	)
 
 	authCourse.Use(middleware.JWT([]byte(conf.JWT_KEY)))
 
 	//authcourse handler
-	authCourse.POST("/create", cont.CreateCourse)
-	authCourse.PUT("/edit/:id", cont.EditCourse)
-	authCourse.DELETE("/delete/:id", cont.DeleteCourse)
+	authCourse.POST("/c/create", cont.CreateCourse)
+	authCourse.PUT("/c/edit/:id", cont.EditCourse)
+	authCourse.DELETE("/c/delete/:id", cont.DeleteCourse)
 
-	courseGroup := e.Group("/course",
+	courseGroup := e.Group("/app",
 		middleware.Logger(),
 		middleware.CORS(),
 	)
 	//course handler
-	courseGroup.GET("/all", cont.GetCourses)
-	courseGroup.GET("/:id", cont.GetCourse)
+	courseGroup.GET("/c/all", cont.GetCourses)
+	courseGroup.GET("/c/:id", cont.GetCourse)
 }
 
 func RegisterRoleGroupAPI(e *echo.Echo, conf config.Config) {
@@ -83,25 +80,82 @@ func RegisterRoleGroupAPI(e *echo.Echo, conf config.Config) {
 		service: svc,
 	}
 
-	authRole := e.Group("/role",
+	authRole := e.Group("/app",
 		middleware.Logger(),
 		middleware.CORS(),
-		m.APIKEYMiddleware,
 	)
 
 	authRole.Use(middleware.JWT([]byte(conf.JWT_KEY)))
 
 	//authRole handler
-	authRole.POST("/create", cont.CreateRole)
-	authRole.PUT("/edit/:id", cont.EditRole)
-	authRole.DELETE("/delete/:id", cont.DeleteRole)
+	authRole.POST("/r/create", cont.CreateRole)
+	authRole.PUT("/r/edit/:id", cont.EditRole)
+	authRole.DELETE("/r/delete/:id", cont.DeleteRole)
 
-	roleGroup := e.Group("/course",
+	roleGroup := e.Group("/app",
 		middleware.Logger(),
 		middleware.CORS(),
 	)
 	//role handler
-	roleGroup.GET("/:id", cont.GetRole)
+	roleGroup.GET("/r/:id", cont.GetRole)
+
+}
+
+func RegisterCourseCategoryGroupAPI(e *echo.Echo, conf config.Config) {
+	db := database.InitDB(conf)
+	repo := repository.NewCourseCategoryRepository(db)
+
+	svc := service.NewCourseCategoryService(repo)
+
+	cont := CourseCategoryController{
+		service: svc,
+	}
+
+	authRole := e.Group("/app",
+		middleware.Logger(),
+		middleware.CORS(),
+	)
+
+	authRole.Use(middleware.JWT([]byte(conf.JWT_KEY)))
+
+	//authCCategory handler
+	authRole.POST("/cc/create", cont.CreateCourseCategory)
+
+	roleGroup := e.Group("/app",
+		middleware.Logger(),
+		middleware.CORS(),
+	)
+	//ccategory handler
+	roleGroup.GET("/cc", cont.GetCoursesCategory)
+
+}
+
+func RegisterTypeCategoryGroupAPI(e *echo.Echo, conf config.Config) {
+	db := database.InitDB(conf)
+	repo := repository.NewTypeCategoryRepository(db)
+
+	svc := service.NewTypeCategoryService(repo)
+
+	cont := TypeCategoryController{
+		service: svc,
+	}
+
+	// authRole := e.Group("/app",
+	// 	middleware.Logger(),
+	// 	middleware.CORS(),
+	// )
+
+	// authRole.Use(middleware.JWT([]byte(conf.JWT_KEY)))
+
+	// //authCCategory handler
+	// authRole.POST("/cc/create", cont.CreateCourseCategory)
+
+	roleGroup := e.Group("/app",
+		middleware.Logger(),
+		middleware.CORS(),
+	)
+	//ccategory handler
+	roleGroup.GET("/tc", cont.GetTypeCourse)
 
 }
 
