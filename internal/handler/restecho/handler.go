@@ -172,7 +172,6 @@ func RegisterMaterialGroupAPI(e *echo.Echo, conf config.Config) {
 	authMaterial := e.Group("/material",
 		middleware.Logger(),
 		middleware.CORS(),
-		m.APIKEYMiddleware,
 	)
 
 	authMaterial.Use(middleware.JWT([]byte(conf.JWT_KEY)))
