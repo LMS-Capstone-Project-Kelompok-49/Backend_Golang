@@ -13,6 +13,6 @@ type Material struct {
 	MaterialID   int            `gorm:"primary_key ; AUTO_INCREMENT" json:"-"`
 	CourseID     int            `json:"-"`
 	MaterialName int            `json:"materialname" form:"materialname"`
-	PPT          int            `json:"ppt" form:"ppt"`
+	PPT          string         `json:"ppt" form:"ppt"`
 	Video        string         `json:"video" form:"video"`
 }

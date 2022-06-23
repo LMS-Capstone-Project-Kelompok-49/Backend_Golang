@@ -1,11 +1,17 @@
 package restecho
 
 import (
+	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 
+	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/bucket"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/domain"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/model"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -16,49 +22,75 @@ type MaterialController struct {
 func (mc *MaterialController) CreateMaterial(c echo.Context) error {
 	material := model.Material{}
 	courseid, _ := strconv.Atoi(c.Param("courseid"))
-	// file, err := c.FormFile("video")
-	// if err != nil {
-	// 	return fmt.Errorf("error")
-	// }
-
-	// // dir, err := os.Getwd()
-	// // if err != nil {
-	// // 	return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-	// // 		"messages": "err.Error()",
-	// // 	})
-	// // }
-
-	// src, err := file.Open()
-	// if err != nil {
-	// 	return fmt.Errorf("error")
-	// }
-	// defer src.Close()
-
-	// dst, err := os.Create(file.Filename)
-	// if err != nil {
-	// 	return err
-	// }
-	// defer dst.Close()
-
-	// if _, err := io.Copy(dst, src); err != nil {
-	// 	return err
-	// }
-
 	c.Bind(&material)
-	// bearer := c.Get("user").(*jwt.Token)
-	// claim := bearer.Claims.(jwt.MapClaims)
-	// course.MentorID = int(claim["id"].(float64))
-	material.CourseID = courseid
+	video, err := c.FormFile("video")
+	if err != nil {
+		return fmt.Errorf("error")
+	}
+	if video != nil {
+		vidSrc, err := video.Open()
+		if err != nil {
+			return fmt.Errorf("error")
+		}
+		defer vidSrc.Close()
 
-	//upload file
-	// fmt.Println(file.Header)
-	// res, err := gdrive.GoUp(file.Filename)
-	// if err != nil {
-	// 	return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-	// 		"messages": err.Error(),
-	// 	})
-	// }
-	// material.Video = res.Id
+		vidPath := filepath.Join("temp", video.Filename)
+
+		vidDst, err := os.Create(vidPath)
+		if err != nil {
+			return fmt.Errorf("error")
+		}
+		defer vidDst.Close()
+
+		if _, err := io.Copy(vidDst, vidSrc); err != nil {
+			return fmt.Errorf("error")
+		}
+
+		if videoUrl, err := bucket.UploadFile(video.Filename, vidPath, "video"); err != nil {
+			return fmt.Errorf("error")
+		} else {
+			material.Video = videoUrl
+			err := os.Remove(vidPath)
+			if err != nil {
+				return fmt.Errorf("error")
+			}
+		}
+	}
+	ppt, err := c.FormFile("ppt")
+	if err != nil {
+		return fmt.Errorf("error")
+	}
+	if ppt != nil {
+		pptSrc, err := ppt.Open()
+		if err != nil {
+			return fmt.Errorf("error")
+		}
+		defer pptSrc.Close()
+
+		pptPath := filepath.Join("temp", ppt.Filename)
+
+		pptDst, err := os.Create(pptPath)
+		if err != nil {
+			return fmt.Errorf("error")
+		}
+		defer pptDst.Close()
+
+		if _, err := io.Copy(pptDst, pptSrc); err != nil {
+			return fmt.Errorf("error")
+		}
+
+		if pptUrl, err := bucket.UploadFile(ppt.Filename, pptPath, "ppt"); err != nil {
+			return fmt.Errorf("error")
+		} else {
+			material.PPT = pptUrl
+			err := os.Remove(pptPath)
+			if err != nil {
+				return fmt.Errorf("error")
+			}
+		}
+	}
+
+	material.CourseID = courseid
 
 	rescode, err := mc.service.Store(material)
 
