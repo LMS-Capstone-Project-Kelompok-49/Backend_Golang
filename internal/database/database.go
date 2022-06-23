@@ -26,6 +26,6 @@ func InitDB(conf config.Config) *gorm.DB {
 		fmt.Println("error open conection : ", err)
 	}
 
-	DB.AutoMigrate(&model.User{}, &model.Role{}, &model.Course{})
+	DB.AutoMigrate(&model.User{}, &model.Role{}, &model.Course{}, &model.Material{})
 	return DB
 }

@@ -104,3 +104,35 @@ func RegisterRoleGroupAPI(e *echo.Echo, conf config.Config) {
 	roleGroup.GET("/:id", cont.GetRole)
 
 }
+
+func RegisterMaterialGroupAPI(e *echo.Echo, conf config.Config) {
+	db := database.InitDB(conf)
+	repo := repository.NewMaterialRepository(db)
+
+	svc := service.NewMaterialService(repo)
+
+	cont := MaterialController{
+		service: svc,
+	}
+
+	authMaterial := e.Group("/material",
+		middleware.Logger(),
+		middleware.CORS(),
+		m.APIKEYMiddleware,
+	)
+
+	authMaterial.Use(middleware.JWT([]byte(conf.JWT_KEY)))
+
+	//authMaterial handler
+	authMaterial.POST("/create/:courseid", cont.CreateMaterial)
+	authMaterial.PUT("/edit/:id", cont.EditMaterial)
+	authMaterial.DELETE("/delete/:id", cont.DeleteMaterial)
+	//--
+
+	materialGroup := e.Group("/material")
+
+	//material handler
+	materialGroup.GET("/course/:courseid", cont.GetMaterials)
+	materialGroup.GET("/:id", cont.GetMaterial)
+	//--
+}
