@@ -174,7 +174,7 @@ func RegisterMaterialGroupAPI(e *echo.Echo, conf config.Config) {
 		middleware.CORS(),
 	)
 
-	authMaterial.Use(middleware.JWT([]byte(conf.JWT_KEY)))
+	// authMaterial.Use(middleware.JWT([]byte(conf.JWT_KEY)))
 
 	//authMaterial handler
 	authMaterial.POST("/create/:courseid", cont.CreateMaterial)

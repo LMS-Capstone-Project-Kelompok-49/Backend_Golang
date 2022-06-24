@@ -25,14 +25,12 @@ func (mc *MaterialController) CreateMaterial(c echo.Context) error {
 	c.Bind(&material)
 	video, err := c.FormFile("video")
 	if err != nil {
-		return fmt.Errorf("error")
-	}
-	if video != nil {
+		material.Video = ""
+	} else {
 		vidSrc, err := video.Open()
 		if err != nil {
 			return fmt.Errorf("error")
 		}
-		defer vidSrc.Close()
 
 		vidPath := filepath.Join("temp", video.Filename)
 
@@ -40,7 +38,6 @@ func (mc *MaterialController) CreateMaterial(c echo.Context) error {
 		if err != nil {
 			return fmt.Errorf("error")
 		}
-		defer vidDst.Close()
 
 		if _, err := io.Copy(vidDst, vidSrc); err != nil {
 			return fmt.Errorf("error")
@@ -49,18 +46,21 @@ func (mc *MaterialController) CreateMaterial(c echo.Context) error {
 		if videoUrl, err := bucket.UploadFile(video.Filename, vidPath, "video"); err != nil {
 			return fmt.Errorf("error")
 		} else {
+			vidSrc.Close()
+			vidDst.Close()
+
 			material.Video = videoUrl
+
 			err := os.Remove(vidPath)
 			if err != nil {
-				return fmt.Errorf("error")
+				return err
 			}
 		}
 	}
 	ppt, err := c.FormFile("ppt")
 	if err != nil {
-		return fmt.Errorf("error")
-	}
-	if ppt != nil {
+		material.PPT = ""
+	} else {
 		pptSrc, err := ppt.Open()
 		if err != nil {
 			return fmt.Errorf("error")
@@ -82,10 +82,14 @@ func (mc *MaterialController) CreateMaterial(c echo.Context) error {
 		if pptUrl, err := bucket.UploadFile(ppt.Filename, pptPath, "ppt"); err != nil {
 			return fmt.Errorf("error")
 		} else {
+			pptSrc.Close()
+			pptDst.Close()
+
 			material.PPT = pptUrl
+
 			err := os.Remove(pptPath)
 			if err != nil {
-				return fmt.Errorf("error")
+				return err
 			}
 		}
 	}
@@ -102,21 +106,116 @@ func (mc *MaterialController) CreateMaterial(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, map[string]interface{}{
-		"messages": "success " + string(rescode),
+		"messages": "success " + fmt.Sprintf("%d", rescode),
 		"material": material,
 	})
 }
 
 func (mc *MaterialController) EditMaterial(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
+
+	data, err := mc.service.GetOneMaterial(id)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": err.Error(),
+			"aa":       err.Error(),
+		})
+	}
+
 	material := model.Material{}
 	c.Bind(&material)
+
+	video, err := c.FormFile("video")
+	if err != nil {
+		material.Video = ""
+	} else {
+		vidSrc, err := video.Open()
+		if err != nil {
+			return fmt.Errorf("error")
+		}
+
+		vidPath := filepath.Join("temp", video.Filename)
+
+		vidDst, err := os.Create(vidPath)
+		if err != nil {
+			return fmt.Errorf("error")
+		}
+
+		if _, err := io.Copy(vidDst, vidSrc); err != nil {
+			return fmt.Errorf("error")
+		}
+
+		if videoUrl, err := bucket.UploadFile(video.Filename, vidPath, "video"); err != nil {
+			return fmt.Errorf("error")
+		} else {
+			vidSrc.Close()
+			vidDst.Close()
+
+			_, fname := filepath.Split(data.Video)
+
+			err := bucket.RemoveFile(fname, "video")
+			if err != nil {
+				return err
+			}
+
+			material.Video = videoUrl
+
+			err = os.Remove(vidPath)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	ppt, err := c.FormFile("ppt")
+	if err != nil {
+		material.PPT = ""
+	} else {
+		pptSrc, err := ppt.Open()
+		if err != nil {
+			return fmt.Errorf("error")
+		}
+		defer pptSrc.Close()
+
+		pptPath := filepath.Join("temp", ppt.Filename)
+
+		pptDst, err := os.Create(pptPath)
+		if err != nil {
+			return fmt.Errorf("error")
+		}
+		defer pptDst.Close()
+
+		if _, err := io.Copy(pptDst, pptSrc); err != nil {
+			return fmt.Errorf("error")
+		}
+
+		if pptUrl, err := bucket.UploadFile(ppt.Filename, pptPath, "ppt"); err != nil {
+			return fmt.Errorf("error")
+		} else {
+			pptSrc.Close()
+			pptDst.Close()
+
+			_, fname := filepath.Split(data.PPT)
+
+			err := bucket.RemoveFile(fname, "ppt")
+			if err != nil {
+				return err
+			}
+
+			material.PPT = pptUrl
+
+			err = os.Remove(pptPath)
+			if err != nil {
+				return err
+			}
+		}
+	}
 
 	// bearer := c.Get("user").(*jwt.Token)
 	// claim := bearer.Claims.(jwt.MapClaims)
 
-	err := mc.service.Edit(id, material)
-	if err != nil {
+	err1 := mc.service.Edit(id, material)
+	if err1 != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"messages": "no id or no change or unauthorization",
 		})

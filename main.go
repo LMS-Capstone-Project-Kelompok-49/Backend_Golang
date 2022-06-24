@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	conf "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/config"
 	rest "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho"
@@ -28,6 +29,8 @@ func main() {
 			"Message": "Welcome! You can check documentation at http://54.236.5.123/swagger !",
 		})
 	})
+
+	os.Mkdir("temp", 0755)
 
 	rest.RegisterUserGroupAPI(e, config)
 	rest.RegisterCourseGroupAPI(e, config)
