@@ -229,10 +229,31 @@ func (mc *MaterialController) EditMaterial(c echo.Context) error {
 func (mc *MaterialController) DeleteMaterial(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 
+	data, err := mc.service.GetOneMaterial(id)
+	if err != nil {
+		return err
+	}
+
+	if data.Video != "" {
+		_, fname := filepath.Split(data.Video)
+		err := bucket.RemoveFile(fname, "video")
+		if err != nil {
+			return err
+		}
+	}
+
+	if data.PPT != "" {
+		_, fname := filepath.Split(data.PPT)
+		err := bucket.RemoveFile(fname, "ppt")
+		if err != nil {
+			return err
+		}
+	}
+
 	// bearer := c.Get("user").(*jwt.Token)
 	// claim := bearer.Claims.(jwt.MapClaims)
 
-	err := mc.service.Delete(id)
+	err = mc.service.Delete(id)
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
