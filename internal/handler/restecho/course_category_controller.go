@@ -5,6 +5,7 @@ import (
 
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/domain"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/model"
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 )
 
@@ -13,6 +14,17 @@ type CourseCategoryController struct {
 }
 
 func (cc *CourseCategoryController) CreateCourseCategory(c echo.Context) error {
+	//cek role
+	bearer := c.Get("user").(*jwt.Token)
+	claim := bearer.Claims.(jwt.MapClaims)
+
+	if int(claim["role"].(float64)) != 1 { //role 1 = admin
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"messages": "unauthorized",
+			"status":   http.StatusUnauthorized,
+		})
+	}
+
 	course := model.CourseCategory{}
 
 	c.Bind(&course)

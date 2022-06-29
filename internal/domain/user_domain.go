@@ -15,7 +15,7 @@ type UserAdapterRepository interface {
 
 type UserAdapterService interface {
 	CreateUserService(user model.User) (error, int)
-	UpdateUserService(id, idToken int, user model.User) error
+	UpdateUserService(id int, user model.User) error
 	GetAllUsersService() []model.User
 	GetUserByID(id int) (model.User, error)
 	LoginUser(email, password string) (string, int)

@@ -14,8 +14,8 @@ type CourseRepository interface {
 
 type CourseService interface {
 	Store(course model.Course) (int, error)
-	Edit(id int, idToken int, course model.Course) error
-	Delete(id int, idToken int) error
+	Edit(id int, course model.Course) error
+	Delete(id int) error
 	GetAllCourses() []model.Course
 	GetOneCourse(id int) (model.Course, error)
 }

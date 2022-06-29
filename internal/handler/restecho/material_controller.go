@@ -11,18 +11,39 @@ import (
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/bucket"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/domain"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/model"
+	"github.com/golang-jwt/jwt"
 
 	"github.com/labstack/echo/v4"
 )
 
 type MaterialController struct {
-	service domain.MaterialService
+	service       domain.MaterialService
+	courseService domain.CourseService
 }
 
 func (mc *MaterialController) CreateMaterial(c echo.Context) error {
 	material := model.Material{}
 	courseid, _ := strconv.Atoi(c.Param("courseid"))
 	c.Bind(&material)
+
+	//cek mentor
+	mentor, err := mc.courseService.GetOneCourse(courseid)
+	bearer := c.Get("user").(*jwt.Token)
+	claim := bearer.Claims.(jwt.MapClaims)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": "no id or no change or unauthorization",
+		})
+	}
+
+	if mentor.MentorID != int(claim["id"].(float64)) {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"messages": "unauthorized",
+			"status":   http.StatusUnauthorized,
+		})
+	}
+
 	video, err := c.FormFile("video")
 	if err != nil {
 		material.Video = ""
@@ -120,6 +141,25 @@ func (mc *MaterialController) EditMaterial(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"messages": err.Error(),
 			"aa":       err.Error(),
+		})
+	}
+
+	//cek mentor
+	courseid := data.CourseID
+	mentor, err := mc.courseService.GetOneCourse(courseid)
+	bearer := c.Get("user").(*jwt.Token)
+	claim := bearer.Claims.(jwt.MapClaims)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": "no id or no change or unauthorization",
+		})
+	}
+
+	if mentor.MentorID != int(claim["id"].(float64)) {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"messages": "unauthorized",
+			"status":   http.StatusUnauthorized,
 		})
 	}
 
@@ -232,6 +272,25 @@ func (mc *MaterialController) DeleteMaterial(c echo.Context) error {
 	data, err := mc.service.GetOneMaterial(id)
 	if err != nil {
 		return err
+	}
+
+	//cek mentor
+	courseid := data.CourseID
+	mentor, err := mc.courseService.GetOneCourse(courseid)
+	bearer := c.Get("user").(*jwt.Token)
+	claim := bearer.Claims.(jwt.MapClaims)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": "no id or no change or unauthorization",
+		})
+	}
+
+	if mentor.MentorID != int(claim["id"].(float64)) {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"messages": "unauthorized",
+			"status":   http.StatusUnauthorized,
+		})
 	}
 
 	if data.Video != "" {

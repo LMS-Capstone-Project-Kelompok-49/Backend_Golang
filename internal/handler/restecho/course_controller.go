@@ -45,7 +45,20 @@ func (cc *CourseController) EditCourse(c echo.Context) error {
 	bearer := c.Get("user").(*jwt.Token)
 	claim := bearer.Claims.(jwt.MapClaims)
 
-	err := cc.service.Edit(id, int(claim["id"].(float64)), course)
+	cekMentor, err := cc.service.GetOneCourse(id)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": "no id or deleted",
+		})
+	}
+
+	if int(claim["id"].(float64)) != cekMentor.MentorID || int(claim["role"].(float64)) != 1 { //role 1 = admin
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"messages": "unauthorized",
+		})
+	}
+
+	err = cc.service.Edit(id, course)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"messages": "no id or no change or unauthorization",
@@ -65,7 +78,20 @@ func (cc *CourseController) DeleteCourse(c echo.Context) error {
 	bearer := c.Get("user").(*jwt.Token)
 	claim := bearer.Claims.(jwt.MapClaims)
 
-	err := cc.service.Delete(id, int(claim["id"].(float64)))
+	cekMentor, err := cc.service.GetOneCourse(id)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": "no id or deleted",
+		})
+	}
+
+	if int(claim["id"].(float64)) != cekMentor.MentorID || int(claim["role"].(float64)) != 1 { //role 1 = admin
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"messages": "unauthorized",
+		})
+	}
+
+	err = cc.service.Delete(id)
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{

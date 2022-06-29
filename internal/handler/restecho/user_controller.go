@@ -51,10 +51,18 @@ func (ce *EchoController) UpdateUserController(c echo.Context) error {
 	user := model.User{}
 	c.Bind(&user)
 
+	//cek id || role
 	bearer := c.Get("user").(*jwt.Token)
 	claim := bearer.Claims.(jwt.MapClaims)
 
-	err := ce.svc.UpdateUserService(intID, int(claim["id"].(float64)), user)
+	if int(claim["id"].(float64)) != intID || int(claim["role"].(float64)) != 1 { //role 1 = admin
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"messages": "unauthorized",
+			"status":   http.StatusUnauthorized,
+		})
+	}
+
+	err := ce.svc.UpdateUserService(intID, user)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"messages": "no id or no change or unauthorization",
@@ -72,6 +80,17 @@ func (ce *EchoController) DeleteUserController(c echo.Context) error {
 	id := c.Param("id")
 	intID, _ := strconv.Atoi(id)
 
+	//cek id || role
+	bearer := c.Get("user").(*jwt.Token)
+	claim := bearer.Claims.(jwt.MapClaims)
+
+	if int(claim["id"].(float64)) != intID || int(claim["role"].(float64)) != 1 { //role 1 = admin
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"messages": "unauthorized",
+			"status":   http.StatusUnauthorized,
+		})
+	}
+
 	err := ce.svc.DeleteByID(intID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
@@ -87,10 +106,7 @@ func (ce *EchoController) DeleteUserController(c echo.Context) error {
 func (ce *EchoController) GetUserController(c echo.Context) error {
 	fmt.Println("eksekusi handler")
 	id := c.Param("id")
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-
-	}
+	intID, _ := strconv.Atoi(id)
 
 	res, err := ce.svc.GetUserByID(intID)
 	if err != nil {
