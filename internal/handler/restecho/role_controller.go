@@ -11,23 +11,23 @@ import (
 )
 
 type RoleController struct {
-	service  domain.RoleService
-	uservice domain.UserAdapterService
+	service domain.RoleService
 }
 
 func (rc *RoleController) CreateRole(c echo.Context) error {
-	role := model.Role{}
-
-	c.Bind(&role)
+	//cek role
 	bearer := c.Get("user").(*jwt.Token)
 	claim := bearer.Claims.(jwt.MapClaims)
-	usr, _ := rc.uservice.GetUserByID(int(claim["id"].(float64)))
 
-	if usr.RoleID != 1 {
+	if int(claim["role"].(float64)) != 1 { //role 1 = admin
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
 			"messages": "unauthorized",
+			"status":   http.StatusUnauthorized,
 		})
 	}
+
+	role := model.Role{}
+	c.Bind(&role)
 
 	rescode, err := rc.service.Store(role)
 
@@ -45,19 +45,20 @@ func (rc *RoleController) CreateRole(c echo.Context) error {
 }
 
 func (rc *RoleController) EditRole(c echo.Context) error {
+	//cek role
+	bearer := c.Get("user").(*jwt.Token)
+	claim := bearer.Claims.(jwt.MapClaims)
+
+	if int(claim["role"].(float64)) != 1 { //role 1 = admin
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"messages": "unauthorized",
+			"status":   http.StatusUnauthorized,
+		})
+	}
+
 	id, _ := strconv.Atoi(c.Param("id"))
 	role := model.Role{}
 	c.Bind(&role)
-
-	bearer := c.Get("user").(*jwt.Token)
-	claim := bearer.Claims.(jwt.MapClaims)
-	usr, _ := rc.uservice.GetUserByID(int(claim["id"].(float64)))
-
-	if usr.RoleID != 1 {
-		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
-			"messages": "unauthorized",
-		})
-	}
 
 	err := rc.service.Edit(id, role)
 	if err != nil {
@@ -73,17 +74,18 @@ func (rc *RoleController) EditRole(c echo.Context) error {
 }
 
 func (rc *RoleController) DeleteRole(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
-
+	//cek role
 	bearer := c.Get("user").(*jwt.Token)
 	claim := bearer.Claims.(jwt.MapClaims)
-	usr, _ := rc.uservice.GetUserByID(int(claim["id"].(float64)))
 
-	if usr.RoleID != 1 {
+	if int(claim["role"].(float64)) != 1 { //role 1 = admin
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
 			"messages": "unauthorized",
+			"status":   http.StatusUnauthorized,
 		})
 	}
+
+	id, _ := strconv.Atoi(c.Param("id"))
 
 	err := rc.service.Delete(id)
 

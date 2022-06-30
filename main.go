@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	conf "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/config"
 	rest "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho"
@@ -29,9 +30,12 @@ func main() {
 		})
 	})
 
+	os.Mkdir("temp", 0755)
+
 	rest.RegisterUserGroupAPI(e, config)
 	rest.RegisterCourseGroupAPI(e, config)
 	rest.RegisterRoleGroupAPI(e, config)
+	rest.RegisterMaterialGroupAPI(e, config)
 	rest.RegisterCourseCategoryGroupAPI(e, config)
 	rest.RegisterTypeCategoryGroupAPI(e, config)
 

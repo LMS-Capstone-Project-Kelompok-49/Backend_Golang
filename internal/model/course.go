@@ -11,7 +11,7 @@ type Course struct {
 	UpdatedAt   time.Time      `json:"-"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
 	CourseID    int            `gorm:"primary_key ; AUTO_INCREMENT" json:"-"`
-	MentorID    string         `json:"-"`
+	MentorID    int         `json:"-"`
 	CourseType  string         `json:"coursetype" form:"coursetype"`
 	Category    string         `json:"category" form:"category"`
 	CourseName  string         `json:"coursename" form:"coursename"`

@@ -41,6 +41,7 @@ func InitDB(conf config.Config) *gorm.DB {
 		&model.Course{},
 		&model.CourseCategory{},
 		&model.CourseType{},
+		&model.Material{},
 	)
 	return DB
 }

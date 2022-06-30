@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/config"
@@ -32,11 +31,7 @@ func (s *svcUser) CreateUserService(user model.User) (error, int) {
 	// return nil, http.StatusOK
 }
 
-func (s *svcUser) UpdateUserService(id, idToken int, user model.User) error {
-	fmt.Println(id, idToken)
-	if id != idToken {
-		return fmt.Errorf("error")
-	}
+func (s *svcUser) UpdateUserService(id int, user model.User) error {
 	return s.repo.UpdateOneByID(id, user)
 }
 
@@ -58,7 +53,7 @@ func (s *svcUser) LoginUser(email, password string) (string, int) {
 		return "", http.StatusUnauthorized
 	}
 
-	token, err := helper.CreateToken(int(user.UserID), user.Email, s.c.JWT_KEY)
+	token, err := helper.CreateToken(int(user.UserID), user.Email, user.RoleID, s.c.JWT_KEY)
 	if err != nil {
 		return "", http.StatusInternalServerError
 	}
