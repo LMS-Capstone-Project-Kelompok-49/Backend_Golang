@@ -18,9 +18,9 @@ func (cc *CourseController) CreateCourse(c echo.Context) error {
 	course := model.Course{}
 
 	c.Bind(&course)
-	// bearer := c.Get("user").(*jwt.Token)
-	// claim := bearer.Claims.(jwt.MapClaims)
-	// course.MentorID = int(claim["id"].(float64))
+	bearer := c.Get("user").(*jwt.Token)
+	claim := bearer.Claims.(jwt.MapClaims)
+	course.MentorID = int(claim["id"].(float64))
 
 	rescode, err := cc.service.Store(course)
 

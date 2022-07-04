@@ -3,6 +3,7 @@ package restecho
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -27,22 +28,22 @@ func (mc *MaterialController) CreateMaterial(c echo.Context) error {
 	c.Bind(&material)
 
 	//cek mentor
-	// mentor, err := mc.courseService.GetOneCourse(courseid)
-	// bearer := c.Get("user").(*jwt.Token)
-	// claim := bearer.Claims.(jwt.MapClaims)
+	mentor, err := mc.courseService.GetOneCourse(courseid)
+	bearer := c.Get("user").(*jwt.Token)
+	claim := bearer.Claims.(jwt.MapClaims)
 
-	// if err != nil {
-	// 	return c.JSON(http.StatusNotFound, map[string]interface{}{
-	// 		"messages": "no id or no change or unauthorization",
-	// 	})
-	// }
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": "no id or no change or unauthorization",
+		})
+	}
 
-	// if mentor.MentorID != int(claim["id"].(float64)) {
-	// 	return c.JSON(http.StatusUnauthorized, map[string]interface{}{
-	// 		"messages": "unauthorized",
-	// 		"status":   http.StatusUnauthorized,
-	// 	})
-	// }
+	if mentor.MentorID != int(claim["id"].(float64)) {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"messages": "unauthorized",
+			"status":   http.StatusUnauthorized,
+		})
+	}
 
 	video, err := c.FormFile("video")
 	if err != nil {
@@ -271,20 +272,22 @@ func (mc *MaterialController) DeleteMaterial(c echo.Context) error {
 
 	data, err := mc.service.GetOneMaterial(id)
 	if err != nil {
-		return err
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": "no id or no change or unauthorization",
+		})
 	}
-
 	//cek mentor
 	courseid := data.CourseID
-	mentor, err := mc.courseService.GetOneCourse(courseid)
+	log.Println("courseid : ", courseid)
 	bearer := c.Get("user").(*jwt.Token)
 	claim := bearer.Claims.(jwt.MapClaims)
-
+	mentor, err := mc.courseService.GetOneCourse(courseid)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"messages": "no id or no change or unauthorization",
 		})
 	}
+	log.Println(mentor.MentorID)
 
 	if mentor.MentorID != int(claim["id"].(float64)) {
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
