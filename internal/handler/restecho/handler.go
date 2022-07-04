@@ -24,7 +24,7 @@ func RegisterUserGroupAPI(e *echo.Echo, conf config.Config) {
 		middleware.Logger(),
 		middleware.CORS(),
 	)
-	apiUser := e.Group("/app",
+	apiUser := e.Group("/api",
 		middleware.Logger(),
 		middleware.CORS(),
 	)
@@ -33,10 +33,10 @@ func RegisterUserGroupAPI(e *echo.Echo, conf config.Config) {
 	auth.POST("/register", cont.CreateUserController)
 
 	// Users Handler
-	apiUser.GET("/u", cont.GetUsersController, middleware.JWT([]byte(conf.JWT_KEY)))
-	apiUser.GET("/u/:id", cont.GetUserController, middleware.JWT([]byte(conf.JWT_KEY)))
-	apiUser.PUT("/u/:id", cont.UpdateUserController, middleware.JWT([]byte(conf.JWT_KEY)))
-	apiUser.DELETE("/u/:id", cont.DeleteUserController, middleware.JWT([]byte(conf.JWT_KEY)))
+	apiUser.GET("/user/all", cont.GetUsersController, middleware.JWT([]byte(conf.JWT_KEY)))
+	apiUser.GET("/user/:user_id", cont.GetUserController, middleware.JWT([]byte(conf.JWT_KEY)))
+	apiUser.PUT("/user/:user_id", cont.UpdateUserController, middleware.JWT([]byte(conf.JWT_KEY)))
+	apiUser.DELETE("/user/:user_id", cont.DeleteUserController, middleware.JWT([]byte(conf.JWT_KEY)))
 }
 
 func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
@@ -49,7 +49,7 @@ func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
 		service: svc,
 	}
 
-	authCourse := e.Group("/app",
+	authCourse := e.Group("/api",
 		middleware.Logger(),
 		middleware.CORS(),
 	)
@@ -57,17 +57,17 @@ func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
 	authCourse.Use(middleware.JWT([]byte(conf.JWT_KEY)))
 
 	//authcourse handler
-	authCourse.POST("/c/create", cont.CreateCourse)
-	authCourse.PUT("/c/edit/:id", cont.EditCourse)
-	authCourse.DELETE("/c/delete/:id", cont.DeleteCourse)
+	authCourse.POST("/course/create", cont.CreateCourse)
+	authCourse.PUT("/course/edit/:course_id", cont.EditCourse)
+	authCourse.DELETE("/course/delete/:course_id", cont.DeleteCourse)
 
-	courseGroup := e.Group("/app",
+	courseGroup := e.Group("/api",
 		middleware.Logger(),
 		middleware.CORS(),
 	)
 	//course handler
-	courseGroup.GET("/c/all", cont.GetCourses)
-	courseGroup.GET("/c/:id", cont.GetCourse)
+	courseGroup.GET("/course/all", cont.GetCourses)
+	courseGroup.GET("/course/:course_id", cont.GetCourse)
 }
 
 func RegisterRoleGroupAPI(e *echo.Echo, conf config.Config) {
@@ -80,7 +80,7 @@ func RegisterRoleGroupAPI(e *echo.Echo, conf config.Config) {
 		service: svc,
 	}
 
-	authRole := e.Group("/app",
+	authRole := e.Group("/api",
 		middleware.Logger(),
 		middleware.CORS(),
 	)
@@ -88,16 +88,16 @@ func RegisterRoleGroupAPI(e *echo.Echo, conf config.Config) {
 	authRole.Use(middleware.JWT([]byte(conf.JWT_KEY)))
 
 	//authRole handler
-	authRole.POST("/r/create", cont.CreateRole)
-	authRole.PUT("/r/edit/:id", cont.EditRole)
-	authRole.DELETE("/r/delete/:id", cont.DeleteRole)
+	// authRole.POST("/role/create", cont.CreateRole)
+	// authRole.PUT("/role/edit/:id", cont.EditRole)
+	// authRole.DELETE("/r/delete/:id", cont.DeleteRole)
 
-	roleGroup := e.Group("/app",
+	roleGroup := e.Group("/api",
 		middleware.Logger(),
 		middleware.CORS(),
 	)
 	//role handler
-	roleGroup.GET("/r/:id", cont.GetRole)
+	roleGroup.GET("/role/:id", cont.GetRole)
 
 }
 
@@ -111,7 +111,7 @@ func RegisterCourseCategoryGroupAPI(e *echo.Echo, conf config.Config) {
 		service: svc,
 	}
 
-	authRole := e.Group("/app",
+	authRole := e.Group("/api",
 		middleware.Logger(),
 		middleware.CORS(),
 	)
@@ -119,14 +119,15 @@ func RegisterCourseCategoryGroupAPI(e *echo.Echo, conf config.Config) {
 	authRole.Use(middleware.JWT([]byte(conf.JWT_KEY)))
 
 	//authCCategory handler
-	authRole.POST("/cc/create", cont.CreateCourseCategory)
+	authRole.POST("/course_category/create", cont.CreateCourseCategory)
 
-	roleGroup := e.Group("/app",
+	roleGroup := e.Group("/api",
 		middleware.Logger(),
 		middleware.CORS(),
 	)
 	//ccategory handler
-	roleGroup.GET("/cc", cont.GetCoursesCategory)
+	roleGroup.GET("/course_category", cont.GetCoursesCategory)
+	roleGroup.GET("/course_category/:course_category_id", cont.GetCourseCategory)
 
 }
 
@@ -140,22 +141,13 @@ func RegisterTypeCategoryGroupAPI(e *echo.Echo, conf config.Config) {
 		service: svc,
 	}
 
-	// authRole := e.Group("/app",
-	// 	middleware.Logger(),
-	// 	middleware.CORS(),
-	// )
-
-	// authRole.Use(middleware.JWT([]byte(conf.JWT_KEY)))
-
-	// //authCCategory handler
-	// authRole.POST("/cc/create", cont.CreateCourseCategory)
-
-	roleGroup := e.Group("/app",
+	roleGroup := e.Group("/api",
 		middleware.Logger(),
 		middleware.CORS(),
 	)
 	//ccategory handler
-	roleGroup.GET("/tc", cont.GetTypeCourse)
+	roleGroup.GET("/type_course", cont.GetTypeCourse)
+	roleGroup.GET("/type_course/:type_course_id", cont.GetOneTypeCourse)
 
 }
 

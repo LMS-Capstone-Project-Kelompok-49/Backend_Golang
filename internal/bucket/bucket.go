@@ -11,9 +11,9 @@ import (
 
 func InitMinio() *minio.Client {
 	ctx := context.Background()
-	endpoint := "192.168.1.9:9000"
-	accessKeyID := "minioadmin"
-	secretAccessKey := "minioadmin"
+	endpoint := "35.174.174.120:9000"
+	accessKeyID := "admin-capstone"
+	secretAccessKey := "SemogaLancar12345"
 	useSSL := false
 
 	// Initialize minio client object.

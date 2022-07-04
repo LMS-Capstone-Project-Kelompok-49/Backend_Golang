@@ -2,6 +2,7 @@ package restecho
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/domain"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/model"
@@ -47,6 +48,15 @@ func (cc *CourseCategoryController) CreateCourseCategory(c echo.Context) error {
 	})
 }
 
+func (cc *CourseCategoryController) GetCourseCategory(c echo.Context) error {
+	id := c.Param("course_category_id")
+	intID, _ := strconv.Atoi(id)
+	courses := cc.service.GetOneCategory(intID)
+	return c.JSONPretty(http.StatusOK, map[string]interface{}{
+		"messages": "success",
+		"users":    courses,
+	}, "  ")
+}
 func (cc *CourseCategoryController) GetCoursesCategory(c echo.Context) error {
 	courses := cc.service.GetAllCategory()
 	return c.JSONPretty(http.StatusOK, map[string]interface{}{

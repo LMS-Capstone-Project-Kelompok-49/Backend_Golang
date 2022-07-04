@@ -20,6 +20,13 @@ func (ccr *courseCategoryRepoLayer) GetAll() []model.CourseCategory {
 	return courses
 }
 
+func (ccr *courseCategoryRepoLayer) GetOne(id int) model.CourseCategory {
+	courses := model.CourseCategory{}
+	ccr.DB.Where("course_category_id = ?", id).Find(&courses)
+
+	return courses
+}
+
 // Create implements domain.CourseCategoryRepository
 func (ccr *courseCategoryRepoLayer) Create(course model.CourseCategory) error {
 	res := ccr.DB.Create(&course)

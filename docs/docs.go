@@ -10,7 +10,7 @@ import (
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "54.236.5.123",
+	Host:             "",
 	BasePath:         "/app",
 	Schemes:          []string{},
 	Title:            "Docs",
@@ -28,10 +28,10 @@ const docTemplate = `
   "swagger": "2.0",
   "info": {
     "version": "1.0",
-    "title": "capstone",
+    "title": "Capstone LMS",
     "contact": {}
   },
-  "host": "54.236.5.123",
+  "host": "3.95.181.246",
   "basePath": "/",
   "securityDefinitions": {},
   "schemes": [
@@ -44,50 +44,13 @@ const docTemplate = `
     "application/json"
   ],
   "paths": {
-    "/auth/register": {
-      "post": {
-        "summary": "register",
-        "tags": [
-          "auth"
-        ],
-        "operationId": "register",
-        "deprecated": false,
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "required": false,
-            "default": "Bearer {token}",
-            "type": "string"
-          },
-          {
-            "name": "Body",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/registerrequest"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "headers": {}
-          }
-        }
-      }
-    },
     "/auth/login": {
       "post": {
-        "summary": "login",
+        "summary": "Login",
         "tags": [
-          "auth"
+          "Auth"
         ],
-        "operationId": "login",
+        "operationId": "Login",
         "deprecated": false,
         "produces": [
           "application/json"
@@ -106,7 +69,7 @@ const docTemplate = `
             "required": true,
             "description": "",
             "schema": {
-              "$ref": "#/definitions/loginrequest"
+              "$ref": "#/definitions/LoginRequest"
             }
           }
         ],
@@ -118,13 +81,50 @@ const docTemplate = `
         }
       }
     },
-    "/app/u": {
-      "get": {
-        "summary": "get_users",
+    "/auth/register": {
+      "post": {
+        "summary": "Register",
         "tags": [
-          "users"
+          "Auth"
         ],
-        "operationId": "get_users",
+        "operationId": "Register",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/RegisterRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/api/user/all": {
+      "get": {
+        "summary": "Get All Users",
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetAllUsers",
         "deprecated": false,
         "produces": [
           "application/json"
@@ -146,13 +146,13 @@ const docTemplate = `
         }
       }
     },
-    "/app/u/1": {
+    "/api/user/2": {
       "get": {
-        "summary": "get_one_users",
+        "summary": "Get One User",
         "tags": [
-          "users"
+          "User"
         ],
-        "operationId": "get_one_users",
+        "operationId": "GetOneUser",
         "deprecated": false,
         "produces": [
           "application/json"
@@ -174,11 +174,11 @@ const docTemplate = `
         }
       },
       "put": {
-        "summary": "update_users",
+        "summary": "Update User",
         "tags": [
-          "users"
+          "User"
         ],
-        "operationId": "update_users",
+        "operationId": "UpdateUser",
         "deprecated": false,
         "produces": [
           "application/json"
@@ -197,7 +197,7 @@ const docTemplate = `
             "required": true,
             "description": "",
             "schema": {
-              "$ref": "#/definitions/registerrequest"
+              "$ref": "#/definitions/UpdateUserRequest"
             }
           }
         ],
@@ -209,11 +209,11 @@ const docTemplate = `
         }
       },
       "delete": {
-        "summary": "delete_users",
+        "summary": "Delete User",
         "tags": [
-          "users"
+          "User"
         ],
-        "operationId": "delete_users",
+        "operationId": "DeleteUser",
         "deprecated": false,
         "produces": [
           "application/json"
@@ -235,13 +235,69 @@ const docTemplate = `
         }
       }
     },
-    "/app/c/create": {
-      "post": {
-        "summary": "create_course",
+    "/api/course/all": {
+      "get": {
+        "summary": "Get All Course",
         "tags": [
-          "course"
+          "Course"
         ],
-        "operationId": "create_course",
+        "operationId": "GetAllCourse",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/api/course/2": {
+      "get": {
+        "summary": "Get All Course1",
+        "tags": [
+          "Course"
+        ],
+        "operationId": "GetAllCourse1",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/api/course/create": {
+      "post": {
+        "summary": "Post Course",
+        "tags": [
+          "Course"
+        ],
+        "operationId": "PostCourse",
         "deprecated": false,
         "produces": [
           "application/json"
@@ -260,7 +316,7 @@ const docTemplate = `
             "required": true,
             "description": "",
             "schema": {
-              "$ref": "#/definitions/create_course_request"
+              "$ref": "#/definitions/PostCourseRequest"
             }
           }
         ],
@@ -272,13 +328,13 @@ const docTemplate = `
         }
       }
     },
-    "/app/c/all": {
-      "get": {
-        "summary": "get_course",
+    "/api/course/delete/2": {
+      "delete": {
+        "summary": "Delete Coourse",
         "tags": [
-          "course"
+          "Course"
         ],
-        "operationId": "get_course",
+        "operationId": "DeleteCoourse",
         "deprecated": false,
         "produces": [
           "application/json"
@@ -300,13 +356,13 @@ const docTemplate = `
         }
       }
     },
-    "/app/r": {
+    "/api/role/2": {
       "get": {
-        "summary": "get_role",
+        "summary": "Get Roles",
         "tags": [
-          "role"
+          "Roles"
         ],
-        "operationId": "get_role",
+        "operationId": "GetRoles",
         "deprecated": false,
         "produces": [
           "application/json"
@@ -328,38 +384,236 @@ const docTemplate = `
         }
       }
     },
-    "/c/all": {
+    "/api/type_course": {
       "get": {
-        "summary": "get_course Copy",
+        "summary": "Get Type Course",
         "tags": [
-          "lokal"
+          "Type Course"
         ],
-        "operationId": "get_courseCopy",
+        "operationId": "GetTypeCourse",
         "deprecated": false,
         "produces": [
           "application/json"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/api/type_course/2": {
+      "get": {
+        "summary": "Get One Type Course",
+        "tags": [
+          "Type Course"
+        ],
+        "operationId": "GetOneTypeCourse",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/api/course_category": {
+      "get": {
+        "summary": "Get All Category",
+        "tags": [
+          "Course Category"
+        ],
+        "operationId": "GetAllCategory",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/api/course_category/2": {
+      "get": {
+        "summary": "Get One Category",
+        "tags": [
+          "Course Category"
+        ],
+        "operationId": "GetOneCategory",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/api/course_category/create": {
+      "post": {
+        "summary": "Post Category",
+        "tags": [
+          "Course Category"
+        ],
+        "operationId": "PostCategory",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/PostCategoryRequest"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
             "headers": {}
           }
         },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
+        "security": []
       }
     },
-    "/c/create": {
-      "post": {
-        "summary": "create_course Copy",
+    "/material/course/1": {
+      "get": {
+        "summary": "get material",
         "tags": [
-          "lokal"
+          "Materials"
         ],
-        "operationId": "create_courseCopy",
+        "operationId": "getmaterial",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/material/create/1": {
+      "post": {
+        "summary": "post material",
+        "tags": [
+          "Materials"
+        ],
+        "operationId": "postmaterial",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
+          {
+            "name": "materialname",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "ppt",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "video",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/api/course/delete/1": {
+      "delete": {
+        "summary": "create_course",
+        "tags": [
+          "course"
+        ],
+        "operationId": "Deletecreate_course",
         "deprecated": false,
         "produces": [
           "application/json"
@@ -371,15 +625,6 @@ const docTemplate = `
             "required": true,
             "type": "string",
             "description": ""
-          },
-          {
-            "name": "Body",
-            "in": "body",
-            "required": true,
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/create_course_request"
-            }
           }
         ],
         "responses": {
@@ -388,36 +633,35 @@ const docTemplate = `
             "headers": {}
           }
         },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
+        "security": []
       }
     },
-    "/role/1": {
+    "/api/type_course/1": {
       "get": {
-        "summary": "get_role Copy",
+        "summary": "type_course",
         "tags": [
-          "lokal"
+          "type_course"
         ],
-        "operationId": "get_roleCopy",
+        "operationId": "type_course",
         "deprecated": false,
         "produces": [
           "application/json"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
             "headers": {}
           }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
+        }
       }
     },
     "/role/create": {
@@ -448,21 +692,37 @@ const docTemplate = `
             "headers": {}
           }
         },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
+        "security": []
       }
     }
   },
   "definitions": {
-    "registerrequest": {
-      "title": "registerrequest",
+    "LoginRequest": {
+      "title": "LoginRequest",
       "example": {
-        "name": "lawas",
-        "email": "lawas@mail.com",
-        "password": "lawss12345"
+        "email": "user@mail.com",
+        "password": "user3241"
+      },
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "email",
+        "password"
+      ]
+    },
+    "RegisterRequest": {
+      "title": "RegisterRequest",
+      "example": {
+        "name": "user",
+        "email": "user@mail.com",
+        "password": "user3241"
       },
       "type": "object",
       "properties": {
@@ -482,14 +742,18 @@ const docTemplate = `
         "password"
       ]
     },
-    "loginrequest": {
-      "title": "loginrequest",
+    "UpdateUserRequest": {
+      "title": "UpdateUserRequest",
       "example": {
-        "email": "lawas@mail.com",
-        "password": "lawss12345"
+        "name": "mamang",
+        "email": "kesbor@mail.com",
+        "password": "dik3sMar2"
       },
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string"
+        },
         "email": {
           "type": "string"
         },
@@ -498,33 +762,27 @@ const docTemplate = `
         }
       },
       "required": [
+        "name",
         "email",
         "password"
       ]
     },
-    "create_course_request": {
-      "title": "create_course_request",
+    "PostCourseRequest": {
+      "title": "PostCourseRequest",
       "example": {
-        "mentorid": 1,
-        "coursetype": 2,
-        "category": 2,
-        "coursename": "Halasena",
-        "description": "Swabalah",
-        "courseprice": "2 juta"
+        "coursetype": "lifetime",
+        "category": "website",
+        "coursename": "Dasar Basic Wordpress",
+        "description": "Dalam course ini, anda akan mempelajari.......",
+        "courseprice": 1000000
       },
       "type": "object",
       "properties": {
-        "mentorid": {
-          "type": "integer",
-          "format": "int32"
-        },
         "coursetype": {
-          "type": "integer",
-          "format": "int32"
+          "type": "string"
         },
         "category": {
-          "type": "integer",
-          "format": "int32"
+          "type": "string"
         },
         "coursename": {
           "type": "string"
@@ -533,11 +791,11 @@ const docTemplate = `
           "type": "string"
         },
         "courseprice": {
-          "type": "string"
+          "type": "integer",
+          "format": "int32"
         }
       },
       "required": [
-        "mentorid",
         "coursetype",
         "category",
         "coursename",
@@ -545,12 +803,47 @@ const docTemplate = `
         "courseprice"
       ]
     },
+    "PostCategoryRequest": {
+      "title": "PostCategoryRequest",
+      "example": {
+        "category": "Desktop"
+      },
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "category"
+      ]
+    },
+    "loginCopyRequest": {
+      "title": "loginCopyRequest",
+      "example": {
+        "email": "Admin",
+        "password": "Admin"
+      },
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "email",
+        "password"
+      ]
+    },
     "registerCopyRequest": {
       "title": "registerCopyRequest",
       "example": {
         "name": "Jauh",
         "email": "jauhin@mail.com",
-        "password": "pajajauh"
+        "password": "pajajauh321"
       },
       "type": "object",
       "properties": {
@@ -570,24 +863,19 @@ const docTemplate = `
         "password"
       ]
     },
-    "loginCopyRequest": {
-      "title": "loginCopyRequest",
+    "post_category_request1": {
+      "title": "post_category_request1",
       "example": {
-        "email": "jauhin@mail.com",
-        "password": "pajajauh"
+        "category": "Desktop"
       },
       "type": "object",
       "properties": {
-        "email": {
-          "type": "string"
-        },
-        "password": {
+        "category": {
           "type": "string"
         }
       },
       "required": [
-        "email",
-        "password"
+        "category"
       ]
     },
     "post_roleCopyRequest": {
@@ -614,16 +902,46 @@ const docTemplate = `
   "security": [],
   "tags": [
     {
+      "name": "Auth"
+    },
+    {
+      "name": "User"
+    },
+    {
+      "name": "Course"
+    },
+    {
+      "name": "Roles"
+    },
+    {
+      "name": "Type Course"
+    },
+    {
+      "name": "Course Category"
+    },
+    {
+      "name": "Materials"
+    },
+    {
       "name": "auth"
     },
     {
-      "name": "users"
+      "name": "user"
     },
     {
       "name": "course"
     },
     {
       "name": "role"
+    },
+    {
+      "name": "type_course"
+    },
+    {
+      "name": "course_category"
+    },
+    {
+      "name": "material"
     },
     {
       "name": "lokal"

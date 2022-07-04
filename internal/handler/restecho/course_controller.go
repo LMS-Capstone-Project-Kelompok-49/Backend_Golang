@@ -38,7 +38,7 @@ func (cc *CourseController) CreateCourse(c echo.Context) error {
 }
 
 func (cc *CourseController) EditCourse(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id, _ := strconv.Atoi(c.Param("course_id"))
 	course := model.Course{}
 	c.Bind(&course)
 
@@ -73,19 +73,19 @@ func (cc *CourseController) EditCourse(c echo.Context) error {
 }
 
 func (cc *CourseController) DeleteCourse(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id, _ := strconv.Atoi(c.Param("course_id"))
 
 	bearer := c.Get("user").(*jwt.Token)
 	claim := bearer.Claims.(jwt.MapClaims)
 
-	cekMentor, err := cc.service.GetOneCourse(id)
+	_, err := cc.service.GetOneCourse(id)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"messages": "no id or deleted",
 		})
 	}
 
-	if int(claim["id"].(float64)) != cekMentor.MentorID || int(claim["role"].(float64)) != 1 { //role 1 = admin
+	if int(claim["role"].(float64)) != 1 { //role 1 = admin
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
 			"messages": "unauthorized",
 		})
@@ -114,7 +114,7 @@ func (cc *CourseController) GetCourses(c echo.Context) error {
 }
 
 func (cc *CourseController) GetCourse(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
+	id, _ := strconv.Atoi(c.Param("course_id"))
 
 	res, err := cc.service.GetOneCourse(id)
 

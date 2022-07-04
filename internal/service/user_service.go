@@ -25,7 +25,7 @@ func (s *svcUser) CreateUserService(user model.User) (error, int) {
 	usr, _ := s.repo.GetOneByEmail(user.Email)
 	if usr.Email == user.Email {
 		err = errors.New("Email already registered!")
-		return err, http.StatusBadRequest
+		return err, http.StatusForbidden
 	}
 	return s.repo.CreateUsers(user), http.StatusOK
 	// return nil, http.StatusOK

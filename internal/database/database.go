@@ -31,9 +31,37 @@ func InitDB(conf config.Config) *gorm.DB {
 		RoleName:    "Admin",
 		Description: "Admin",
 	})
+	DB.Create(&model.Role{
+		RoleID:      2,
+		RoleName:    "User",
+		Description: "User",
+	})
 
-	var modela = []model.CourseType{{CourseTypeID: 1, CourseType: "Lifetime"}, {CourseTypeID: 2, CourseType: "Bootcamp"}}
-	DB.Create(modela)
+	DB.Create(&model.User{
+		RoleID:   1,
+		UserID:   1,
+		Name:     "Admin",
+		Email:    "Admin",
+		Password: "Admin",
+	})
+
+	DB.Create(&model.CourseType{
+		CourseTypeID: 1,
+		CourseType:   "Lifetime",
+	})
+	DB.Create(&model.CourseType{
+		CourseTypeID: 2,
+		CourseType:   "Bootcamp",
+	})
+
+	DB.Create(&model.CourseCategory{
+		CourseCategoryID: 1,
+		Category:         "Website",
+	})
+	DB.Create(&model.CourseCategory{
+		CourseCategoryID: 2,
+		Category:         "Mobile",
+	})
 
 	DB.AutoMigrate(
 		&model.User{},

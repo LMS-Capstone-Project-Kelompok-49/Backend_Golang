@@ -27,22 +27,22 @@ func (mc *MaterialController) CreateMaterial(c echo.Context) error {
 	c.Bind(&material)
 
 	//cek mentor
-	mentor, err := mc.courseService.GetOneCourse(courseid)
-	bearer := c.Get("user").(*jwt.Token)
-	claim := bearer.Claims.(jwt.MapClaims)
+	// mentor, err := mc.courseService.GetOneCourse(courseid)
+	// bearer := c.Get("user").(*jwt.Token)
+	// claim := bearer.Claims.(jwt.MapClaims)
 
-	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]interface{}{
-			"messages": "no id or no change or unauthorization",
-		})
-	}
+	// if err != nil {
+	// 	return c.JSON(http.StatusNotFound, map[string]interface{}{
+	// 		"messages": "no id or no change or unauthorization",
+	// 	})
+	// }
 
-	if mentor.MentorID != int(claim["id"].(float64)) {
-		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
-			"messages": "unauthorized",
-			"status":   http.StatusUnauthorized,
-		})
-	}
+	// if mentor.MentorID != int(claim["id"].(float64)) {
+	// 	return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+	// 		"messages": "unauthorized",
+	// 		"status":   http.StatusUnauthorized,
+	// 	})
+	// }
 
 	video, err := c.FormFile("video")
 	if err != nil {

@@ -17,6 +17,10 @@ func (cs *courseCategoryService) GetAllCategory() []model.CourseCategory {
 	return cs.repo.GetAll()
 }
 
+func (cs *courseCategoryService) GetOneCategory(id int) model.CourseCategory {
+	return cs.repo.GetOne(id)
+}
+
 // Store implements domain.CourseService
 func (cs *courseCategoryService) Store(course model.CourseCategory) (int, error) {
 	validate := validator.New()

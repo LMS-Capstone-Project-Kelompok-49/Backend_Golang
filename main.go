@@ -26,7 +26,7 @@ func main() {
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]interface{}{
-			"Message": "Welcome! You can check documentation at http://54.236.5.123/swagger !",
+			"Message": "Welcome! You can check documentation at http://3.95.181.246/swagger/index.html !",
 		})
 	})
 

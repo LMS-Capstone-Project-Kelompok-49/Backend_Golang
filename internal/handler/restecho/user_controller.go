@@ -1,7 +1,6 @@
 package restecho
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -45,7 +44,7 @@ func (ce *EchoController) CreateUserController(c echo.Context) error {
 }
 
 func (ce *EchoController) UpdateUserController(c echo.Context) error {
-	id := c.Param("id")
+	id := c.Param("user_id")
 	intID, _ := strconv.Atoi(id)
 
 	user := model.User{}
@@ -54,8 +53,12 @@ func (ce *EchoController) UpdateUserController(c echo.Context) error {
 	//cek id || role
 	bearer := c.Get("user").(*jwt.Token)
 	claim := bearer.Claims.(jwt.MapClaims)
+	// idnya := int(claim["role"].(float64))
+	// fmt.Println(idnya)
+	// fmt.Printf("Roles: %d -- %d/n", idnya, int(claim["id"].(float64)))
 
-	if int(claim["id"].(float64)) != intID || int(claim["role"].(float64)) != 1 { //role 1 = admin
+	// if int(claim["id"].(float64)) != intID || int(claim["role"].(float64)) != 1 { //role 1 = admin
+	if int(claim["role"].(float64)) != 1 { //role 1 = admin
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
 			"messages": "unauthorized",
 			"status":   http.StatusUnauthorized,
@@ -77,14 +80,14 @@ func (ce *EchoController) UpdateUserController(c echo.Context) error {
 }
 
 func (ce *EchoController) DeleteUserController(c echo.Context) error {
-	id := c.Param("id")
+	id := c.Param("user_id")
 	intID, _ := strconv.Atoi(id)
 
 	//cek id || role
 	bearer := c.Get("user").(*jwt.Token)
 	claim := bearer.Claims.(jwt.MapClaims)
 
-	if int(claim["id"].(float64)) != intID || int(claim["role"].(float64)) != 1 { //role 1 = admin
+	if int(claim["role"].(float64)) != 1 { //role 1 = admin
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
 			"messages": "unauthorized",
 			"status":   http.StatusUnauthorized,
@@ -104,8 +107,7 @@ func (ce *EchoController) DeleteUserController(c echo.Context) error {
 }
 
 func (ce *EchoController) GetUserController(c echo.Context) error {
-	fmt.Println("eksekusi handler")
-	id := c.Param("id")
+	id := c.Param("user_id")
 	intID, _ := strconv.Atoi(id)
 
 	res, err := ce.svc.GetUserByID(intID)
@@ -120,16 +122,6 @@ func (ce *EchoController) GetUserController(c echo.Context) error {
 		"users":    res,
 	})
 }
-
-// Create godoc
-// @Summary Create content
-// @description create content with data
-// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
-// @tags content
-// @Accept json
-// @Produce json
-// @Success 200 {object} content.Content
-// @Router /app [post]
 
 func (ce *EchoController) GetUsersController(c echo.Context) error {
 	users := ce.svc.GetAllUsersService()
@@ -148,7 +140,8 @@ func (ce *EchoController) LoginUserController(c echo.Context) error {
 	token, statusCode := ce.svc.LoginUser(userLogin["email"].(string), userLogin["password"].(string))
 	switch statusCode {
 	case http.StatusUnauthorized:
-		return c.JSONPretty(http.StatusUnauthorized, map[string]interface{}{
+		return c.JSONPretty(http.StatusBadRequest, map[string]interface{}{
+			"status":   http.StatusBadRequest,
 			"messages": "email atau password salah",
 		}, "  ")
 

@@ -29,7 +29,7 @@ func (r *repositoryMysqlLayer) GetAll() []model.User {
 }
 
 func (r *repositoryMysqlLayer) GetOneByID(id int) (user model.User, err error) {
-	res := r.DB.Where("id = ?", id).Find(&user)
+	res := r.DB.Where("user_id = ?", id).Find(&user)
 	if res.RowsAffected < 1 {
 		err = fmt.Errorf("not found")
 	}
@@ -47,7 +47,7 @@ func (r *repositoryMysqlLayer) GetOneByEmail(email string) (user model.User, err
 }
 
 func (r *repositoryMysqlLayer) UpdateOneByID(id int, user model.User) error {
-	res := r.DB.Where("id = ?", id).UpdateColumns(&user)
+	res := r.DB.Where("user_id = ?", id).UpdateColumns(&user)
 	if res.RowsAffected < 1 {
 		return fmt.Errorf("error update")
 	}
