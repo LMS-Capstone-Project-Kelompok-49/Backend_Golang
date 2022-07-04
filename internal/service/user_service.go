@@ -53,7 +53,7 @@ func (s *svcUser) LoginUser(email, password string) (string, int) {
 		return "", http.StatusUnauthorized
 	}
 
-	token, err := helper.CreateToken(int(user.UserID), user.Email, user.RoleID, s.c.JWT_KEY)
+	token, err := helper.CreateToken(int(user.UserID), user.Email, int(user.RoleID), s.c.JWT_KEY)
 	if err != nil {
 		return "", http.StatusInternalServerError
 	}
