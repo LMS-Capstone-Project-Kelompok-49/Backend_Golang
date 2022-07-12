@@ -38,11 +38,11 @@ func InitDB(conf config.Config) *gorm.DB {
 	})
 
 	DB.Create(&model.User{
-		RoleID:   1,
-		UserID:   1,
-		Name:     "Admin",
-		Email:    "Admin",
-		Password: "Admin",
+		RoleID:    1,
+		UserID:    1,
+		Email:     "Admin",
+		Password:  "Admin",
+		ProfileID: 0,
 	})
 
 	DB.Create(&model.CourseType{
@@ -65,6 +65,7 @@ func InitDB(conf config.Config) *gorm.DB {
 
 	DB.AutoMigrate(
 		&model.User{},
+		&model.UserProfile{},
 		&model.Role{},
 		&model.Course{},
 		&model.CourseCategory{},

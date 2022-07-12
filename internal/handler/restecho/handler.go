@@ -181,3 +181,29 @@ func RegisterMaterialGroupAPI(e *echo.Echo, conf config.Config) {
 	materialGroup.GET("/:id", cont.GetMaterial)
 	//--
 }
+
+func RegisterProfileGroupAPI(e *echo.Echo, conf config.Config) {
+	db := database.InitDB(conf)
+	repo := repository.NewProfileRepository(db)
+
+	svc := service.NewProfileService(repo)
+
+	cont := ProfileController{
+		service: svc,
+	}
+
+	authProfile := e.Group("/user/profile",
+		middleware.Logger(),
+		middleware.CORS(),
+	)
+
+	authProfile.Use(middleware.JWT([]byte(conf.JWT_KEY)))
+
+	//authMaterial handler
+	authProfile.POST("/create", cont.CreateProfile)
+	authProfile.PUT("/edit", cont.EditProfile)
+	// authMaterial.DELETE("/delete", cont.)
+	authProfile.GET("", cont.GetProfile)
+	//--
+
+}
