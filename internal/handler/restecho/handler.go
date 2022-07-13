@@ -6,6 +6,13 @@ import (
 
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/config"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/database"
+	course "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/course"
+	course_cat "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/course_cat"
+	course_t "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/course_type"
+	material "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/material"
+	role "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/role"
+	user "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/user"
+
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/repository"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/service"
 )
@@ -17,8 +24,8 @@ func RegisterUserGroupAPI(e *echo.Echo, conf config.Config) {
 
 	svc := service.NewServiceUser(repo, conf)
 
-	cont := EchoController{
-		svc: svc,
+	cont := user.EchoController{
+		Svc: svc,
 	}
 	auth := e.Group("/auth",
 		middleware.Logger(),
@@ -45,8 +52,8 @@ func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
 
 	svc := service.NewCourseService(repo)
 
-	cont := CourseController{
-		service: svc,
+	cont := course.CourseController{
+		Service: svc,
 	}
 
 	authCourse := e.Group("/api",
@@ -76,8 +83,8 @@ func RegisterRoleGroupAPI(e *echo.Echo, conf config.Config) {
 
 	svc := service.NewRoleService(repo)
 
-	cont := RoleController{
-		service: svc,
+	cont := role.RoleController{
+		Service: svc,
 	}
 
 	authRole := e.Group("/api",
@@ -107,8 +114,8 @@ func RegisterCourseCategoryGroupAPI(e *echo.Echo, conf config.Config) {
 
 	svc := service.NewCourseCategoryService(repo)
 
-	cont := CourseCategoryController{
-		service: svc,
+	cont := course_cat.CourseCategoryController{
+		Service: svc,
 	}
 
 	authRole := e.Group("/api",
@@ -137,8 +144,8 @@ func RegisterTypeCategoryGroupAPI(e *echo.Echo, conf config.Config) {
 
 	svc := service.NewTypeCategoryService(repo)
 
-	cont := TypeCategoryController{
-		service: svc,
+	cont := course_t.TypeCategoryController{
+		Service: svc,
 	}
 
 	roleGroup := e.Group("/api",
@@ -157,8 +164,8 @@ func RegisterMaterialGroupAPI(e *echo.Echo, conf config.Config) {
 
 	svc := service.NewMaterialService(repo)
 
-	cont := MaterialController{
-		service: svc,
+	cont := material.MaterialController{
+		Service: svc,
 	}
 
 	authMaterial := e.Group("/material",

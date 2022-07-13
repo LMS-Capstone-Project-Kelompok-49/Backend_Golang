@@ -11,8 +11,9 @@ type User struct {
 	UpdatedAt time.Time      `json:"-"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 	UserID    int            `gorm:"primary_key; AUTO_INCREMENT" json:"-"`
-	Email     string         `json:"email" form:"email" validate:"required,email"`
-	Password  string         `json:"password" form:"password" validate:"required,gte=8"`
+	Name      string         `json:"name" form:"name"`
+	Email     string         `json:"email" form:"email"`
+	Password  string         `json:"password" form:"password"`
 	RoleID    int            `json:"-"`
 	ProfileID int            `json:"-"`
 }
