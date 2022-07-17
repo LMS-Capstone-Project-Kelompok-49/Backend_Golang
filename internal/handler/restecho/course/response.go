@@ -28,6 +28,7 @@ type CourseResponse struct {
 	ID          int
 	Title       string
 	Description string
+	Media       string
 	Mentor      Mentor
 	Material    []MaterialResponse
 }
@@ -58,7 +59,8 @@ func getCourse(model model.Course, material []MaterialResponse) CourseResponse {
 	return CourseResponse{
 		ID:          model.CourseID,
 		Title:       model.CourseName,
-		Description: model.CourseName,
+		Description: model.CourseDetail.Description,
+		Media:       model.CourseDetail.Media,
 		Mentor: Mentor{
 			Name:        model.User.Name,
 			Job:         model.User.Name,
