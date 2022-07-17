@@ -77,6 +77,21 @@ func InitMinio() *minio.Client {
 		log.Printf("Successfully created %s\n", courseAvatar)
 	}
 
+	mediaBucket := "media"
+
+	err = minioClient.MakeBucket(ctx, mediaBucket, minio.MakeBucketOptions{})
+	if err != nil {
+		// Check to see if we already own this bucket (which happens if you run this twice)
+		exists, errBucketExists := minioClient.BucketExists(ctx, mediaBucket)
+		if errBucketExists == nil && exists {
+			log.Printf("We already own %s\n", mediaBucket)
+		} else {
+			log.Fatalln(err)
+		}
+	} else {
+		log.Printf("Successfully created %s\n", mediaBucket)
+	}
+
 	return minioClient
 }
 

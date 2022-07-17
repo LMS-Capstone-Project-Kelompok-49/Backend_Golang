@@ -63,6 +63,11 @@ func InitDB(conf config.Config) *gorm.DB {
 		Category:         "Mobile",
 	})
 
+	DB.Create(&model.CourseCategory{
+		CourseCategoryID: 99,
+		Category:         "Other",
+	})
+
 	DB.AutoMigrate(
 		&model.User{},
 		&model.UserProfile{},

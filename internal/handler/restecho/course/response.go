@@ -10,6 +10,10 @@ type Mentor struct {
 	Description string
 }
 
+type CatResponse struct {
+	Category string
+}
+
 type MaterialResponse struct {
 	Title       string
 	Description string
@@ -28,6 +32,7 @@ type CourseResponse struct {
 	ID          int
 	Title       string
 	Description string
+	Category    string
 	Media       string
 	Mentor      Mentor
 	Material    []MaterialResponse
@@ -55,12 +60,13 @@ func getCourses(model model.Course) CoursesResponse {
 	}
 }
 
-func getCourse(model model.Course, material []MaterialResponse) CourseResponse {
+func getCourse(model model.Course, material []MaterialResponse, cat CatResponse) CourseResponse {
 	return CourseResponse{
 		ID:          model.CourseID,
 		Title:       model.CourseName,
 		Description: model.CourseDetail.Description,
 		Media:       model.CourseDetail.Media,
+		Category:    cat.Category,
 		Mentor: Mentor{
 			Name:        model.User.Name,
 			Job:         model.User.Name,

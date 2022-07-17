@@ -10,7 +10,7 @@ type courseDetailService struct {
 }
 
 // Edit implements domain.CourseDetailService
-func (cd *courseDetailService) Edit(id int, detail model.CourseDetail) error {
+func (cd *courseDetailService) Edit(id int, detail model.CourseDetail) (res model.CourseDetail, err error) {
 	return cd.repo.Update(id, detail)
 }
 

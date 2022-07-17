@@ -16,7 +16,8 @@ import (
 )
 
 type CourseController struct {
-	Service domain.CourseService
+	Service    domain.CourseService
+	CatService domain.CourseCategoryService
 }
 
 func (cc *CourseController) CreateCourse(c echo.Context) error {
@@ -59,6 +60,7 @@ func (cc *CourseController) CreateCourse(c echo.Context) error {
 	course := model.Course{}
 	course = toModelCourse(temp)
 	course.CourseDetail = toModelDetail(temp)
+	course.CourseDetail.CategoryID = 99
 
 	course.MentorID = mentorID
 
@@ -164,6 +166,14 @@ func (cc *CourseController) GetCourse(c echo.Context) error {
 
 	res, err := cc.Service.GetOneCourse(id)
 
+	catId := res.CourseDetail.CategoryID
+
+	catData := cc.CatService.GetOneCategory(catId)
+
+	cat := CatResponse{
+		Category: catData.Category,
+	}
+
 	material := []MaterialResponse{}
 
 	for i := range res.Material {
@@ -178,6 +188,6 @@ func (cc *CourseController) GetCourse(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"messages": "success",
-		"data":     getCourse(res, material),
+		"data":     getCourse(res, material, cat),
 	})
 }

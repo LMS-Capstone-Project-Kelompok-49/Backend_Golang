@@ -23,12 +23,12 @@ func (dr *detailRepo) GetByID(id int) (course model.CourseDetail, err error) {
 }
 
 // Update implements domain.CourseDetailRepository
-func (dr *detailRepo) Update(id int, detail model.CourseDetail) error {
-	res := dr.DB.Where("course_id = ?", id).UpdateColumns(&detail)
-	if res.RowsAffected < 1 {
-		return fmt.Errorf("error update data")
+func (dr *detailRepo) Update(id int, detail model.CourseDetail) (res model.CourseDetail, err error) {
+	data := dr.DB.Where("course_id = ?", id).UpdateColumns(&detail)
+	if data.RowsAffected < 1 {
+		return detail, fmt.Errorf("error update data")
 	}
-	return nil
+	return detail, nil
 }
 
 func NewCourseDetailRepository(db *gorm.DB) domain.CourseDetailRepository {

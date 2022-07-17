@@ -12,10 +12,10 @@ type CourseDetail struct {
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
 	CourseDetailID int            `gorm:"primary_key ; AUTO_INCREMENT" json:"-"`
 	CourseID       int
-	Category       string
-	Description    string `json:"description" form:"description"`
-	Price          string `json:"price" form:"price"`
-	Rating         string `json:"rating" form:"rating"`
-	Avatar         string `json:"thumbnail" form:"thumbnail"`
-	Media          string `json:"media" form:"media"`
+	CategoryID     int            `json:"category_id" form:"category_id"`
+	Description    string         `json:"description" form:"description"`
+	Price          string         `json:"price" form:"price"`
+	Rating         string         `json:"rating" form:"rating"`
+	Avatar         string         `json:"thumbnail" form:"thumbnail"`
+	Media          string         `json:"media" form:"media"`
 }

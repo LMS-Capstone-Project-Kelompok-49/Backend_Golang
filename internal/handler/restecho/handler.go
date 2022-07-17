@@ -51,11 +51,14 @@ func RegisterUserGroupAPI(e *echo.Echo, conf config.Config) {
 func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
 	db := database.InitDB(conf)
 	repo := repository.NewCourseRepository(db)
+	catRepo := repository.NewCourseCategoryRepository(db)
 
 	svc := service.NewCourseService(repo)
+	catSvc := service.NewCourseCategoryService(catRepo)
 
 	cont := course.CourseController{
-		Service: svc,
+		Service:    svc,
+		CatService: catSvc,
 	}
 
 	authCourse := e.Group("/api",
@@ -230,6 +233,8 @@ func RegisterCourseDetailAPI(e *echo.Echo, conf config.Config) {
 		middleware.Logger(),
 		middleware.CORS(),
 	)
+
+	detailGroup.Use(middleware.JWT([]byte(conf.JWT_KEY)))
 
 	detailGroup.PUT("/detail/edit/:course_id", cont.EditDetail)
 	detailGroup.GET("/detail/:course_id", cont.GetByID)
