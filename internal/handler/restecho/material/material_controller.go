@@ -2,11 +2,11 @@ package restecho
 
 import (
 	"fmt"
-	"io"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/bucket"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/domain"
@@ -44,75 +44,34 @@ func (mc *MaterialController) CreateMaterial(c echo.Context) error {
 	// 	})
 	// }
 
+	currentTime := time.Now().Format("2006#01#02#15#04#05")
+	code := strings.ReplaceAll(currentTime, "#", "")
+
 	video, err := c.FormFile("video")
 	if err != nil {
 		material.Video = ""
 	} else {
-		vidSrc, err := video.Open()
+		url, err := bucket.Open(video, "video", fmt.Sprintf("vid_c%d_%s", courseid, code))
 		if err != nil {
-			return fmt.Errorf("error")
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"messages": "error upload file",
+			})
 		}
 
-		vidPath := filepath.Join("temp", video.Filename)
-
-		vidDst, err := os.Create(vidPath)
-		if err != nil {
-			return fmt.Errorf("error")
-		}
-
-		if _, err := io.Copy(vidDst, vidSrc); err != nil {
-			return fmt.Errorf("error")
-		}
-
-		if videoUrl, err := bucket.UploadFile(video.Filename, vidPath, "video"); err != nil {
-			return fmt.Errorf("error")
-		} else {
-			vidSrc.Close()
-			vidDst.Close()
-
-			material.Video = videoUrl
-
-			err := os.Remove(vidPath)
-			if err != nil {
-				return err
-			}
-		}
+		material.Video = url
 	}
 	ppt, err := c.FormFile("ppt")
 	if err != nil {
 		material.PPT = ""
 	} else {
-		pptSrc, err := ppt.Open()
+		url, err := bucket.Open(ppt, "ppt", fmt.Sprintf("ppt_c%d_%s", courseid, code))
 		if err != nil {
-			return fmt.Errorf("error")
-		}
-		defer pptSrc.Close()
-
-		pptPath := filepath.Join("temp", ppt.Filename)
-
-		pptDst, err := os.Create(pptPath)
-		if err != nil {
-			return fmt.Errorf("error")
-		}
-		defer pptDst.Close()
-
-		if _, err := io.Copy(pptDst, pptSrc); err != nil {
-			return fmt.Errorf("error")
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"messages": "error upload file",
+			})
 		}
 
-		if pptUrl, err := bucket.UploadFile(ppt.Filename, pptPath, "ppt"); err != nil {
-			return fmt.Errorf("error")
-		} else {
-			pptSrc.Close()
-			pptDst.Close()
-
-			material.PPT = pptUrl
-
-			err := os.Remove(pptPath)
-			if err != nil {
-				return err
-			}
-		}
+		material.PPT = url
 	}
 
 	material.CourseID = courseid
@@ -120,8 +79,8 @@ func (mc *MaterialController) CreateMaterial(c echo.Context) error {
 	rescode, err := mc.Service.Store(material)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"messages": err.Error(),
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"messages": "error tambah material",
 			"status":   rescode,
 		})
 	}
@@ -166,89 +125,34 @@ func (mc *MaterialController) EditMaterial(c echo.Context) error {
 	material := model.Material{}
 	c.Bind(&material)
 
+	currentTime := time.Now().Format("2006#01#02#15#04#05")
+	code := strings.ReplaceAll(currentTime, "#", "")
+
 	video, err := c.FormFile("video")
 	if err != nil {
 		material.Video = ""
 	} else {
-		vidSrc, err := video.Open()
+		url, err := bucket.Open(video, "video", fmt.Sprintf("vid_c%d_%s", courseid, code))
 		if err != nil {
-			return fmt.Errorf("error")
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"messages": "error upload file",
+			})
 		}
 
-		vidPath := filepath.Join("temp", video.Filename)
-
-		vidDst, err := os.Create(vidPath)
-		if err != nil {
-			return fmt.Errorf("error")
-		}
-
-		if _, err := io.Copy(vidDst, vidSrc); err != nil {
-			return fmt.Errorf("error")
-		}
-
-		if videoUrl, err := bucket.UploadFile(video.Filename, vidPath, "video"); err != nil {
-			return fmt.Errorf("error")
-		} else {
-			vidSrc.Close()
-			vidDst.Close()
-
-			_, fname := filepath.Split(data.Video)
-
-			err := bucket.RemoveFile(fname, "video")
-			if err != nil {
-				return err
-			}
-
-			material.Video = videoUrl
-
-			err = os.Remove(vidPath)
-			if err != nil {
-				return err
-			}
-		}
+		material.Video = url
 	}
 	ppt, err := c.FormFile("ppt")
 	if err != nil {
 		material.PPT = ""
 	} else {
-		pptSrc, err := ppt.Open()
+		url, err := bucket.Open(ppt, "ppt", fmt.Sprintf("ppt_c%d_%s", courseid, code))
 		if err != nil {
-			return fmt.Errorf("error")
-		}
-		defer pptSrc.Close()
-
-		pptPath := filepath.Join("temp", ppt.Filename)
-
-		pptDst, err := os.Create(pptPath)
-		if err != nil {
-			return fmt.Errorf("error")
-		}
-		defer pptDst.Close()
-
-		if _, err := io.Copy(pptDst, pptSrc); err != nil {
-			return fmt.Errorf("error")
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"messages": "error upload file",
+			})
 		}
 
-		if pptUrl, err := bucket.UploadFile(ppt.Filename, pptPath, "ppt"); err != nil {
-			return fmt.Errorf("error")
-		} else {
-			pptSrc.Close()
-			pptDst.Close()
-
-			_, fname := filepath.Split(data.PPT)
-
-			err := bucket.RemoveFile(fname, "ppt")
-			if err != nil {
-				return err
-			}
-
-			material.PPT = pptUrl
-
-			err = os.Remove(pptPath)
-			if err != nil {
-				return err
-			}
-		}
+		material.PPT = url
 	}
 
 	// bearer := c.Get("user").(*jwt.Token)

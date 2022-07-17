@@ -8,8 +8,10 @@ import (
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/database"
 	course "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/course"
 	course_cat "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/course_cat"
+	detail "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/course_detail"
 	course_t "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/course_type"
 	material "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/material"
+	profile "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/profile"
 	role "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/role"
 	user "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/user"
 
@@ -195,8 +197,8 @@ func RegisterProfileGroupAPI(e *echo.Echo, conf config.Config) {
 
 	svc := service.NewProfileService(repo)
 
-	cont := ProfileController{
-		service: svc,
+	cont := profile.ProfileController{
+		Service: svc,
 	}
 
 	authProfile := e.Group("/user/profile",
@@ -213,4 +215,22 @@ func RegisterProfileGroupAPI(e *echo.Echo, conf config.Config) {
 	authProfile.GET("", cont.GetProfile)
 	//--
 
+}
+
+func RegisterCourseDetailAPI(e *echo.Echo, conf config.Config) {
+	db := database.InitDB(conf)
+	repo := repository.NewCourseDetailRepository(db)
+	svc := service.NewCourseDetailService(repo)
+
+	cont := detail.CourseDetailController{
+		Service: svc,
+	}
+
+	detailGroup := e.Group("/course",
+		middleware.Logger(),
+		middleware.CORS(),
+	)
+
+	detailGroup.PUT("/detail/edit/:course_id", cont.EditDetail)
+	detailGroup.GET("/detail/:course_id", cont.GetByID)
 }
