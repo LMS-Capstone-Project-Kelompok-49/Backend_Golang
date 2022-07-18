@@ -42,7 +42,6 @@ func InitDB(conf config.Config) *gorm.DB {
 		UserID:    1,
 		Email:     "Admin",
 		Password:  "Admin",
-		ProfileID: 0,
 	})
 
 	DB.Create(&model.CourseType{

@@ -46,6 +46,7 @@ func (pr *profileRepo) GetByID(id int) (profile model.UserProfile, err error) {
 
 // Update implements domain.ProfileRepository
 func (pr *profileRepo) Update(id int, profile model.UserProfile) error {
+	pr.DB.Model(&model.User{}).Association("UserID")
 	res := pr.DB.Where("user_id = ?", id).UpdateColumns(&profile)
 	if res.RowsAffected < 1 {
 		return fmt.Errorf("error update data")

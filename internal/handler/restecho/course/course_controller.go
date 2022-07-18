@@ -151,8 +151,25 @@ func (cc *CourseController) DeleteCourse(c echo.Context) error {
 func (cc *CourseController) GetCourses(c echo.Context) error {
 	courses := cc.Service.GetAllCourses()
 	data := []CoursesResponse{}
+
 	for i := range courses {
-		data = append(data, getCourses(courses[i]))
+		catId := courses[i].CourseDetail.CategoryID
+
+		catData := cc.CatService.GetOneCategory(catId)
+
+		count := 0
+
+		for j := range courses[i].Material {
+			if courses[i].Material[j].Video != "" {
+				count++
+			}
+		}
+
+		cat := CoursesResponse{
+			CourseCategory: catData.Category,
+			TotalVideo:     count,
+		}
+		data = append(data, getCourses(courses[i], cat))
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status":   http.StatusOK,
@@ -170,15 +187,19 @@ func (cc *CourseController) GetCourse(c echo.Context) error {
 
 	catData := cc.CatService.GetOneCategory(catId)
 
-	cat := CatResponse{
-		Category: catData.Category,
-	}
+	courseResponse := CourseResponse{}
+	courseResponse.Category = catData.Category
 
-	material := []MaterialResponse{}
+	count := 0
 
 	for i := range res.Material {
-		material = append(material, getMaterial(res.Material[i]))
+		courseResponse.Material = append(courseResponse.Material, getMaterial(res.Material[i]))
+		if res.Material[i].Video != "" {
+			count++
+		}
 	}
+
+	courseResponse.TotalVideo = count
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
@@ -188,6 +209,6 @@ func (cc *CourseController) GetCourse(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"messages": "success",
-		"data":     getCourse(res, material, cat),
+		"data":     getCourse(res, courseResponse),
 	})
 }

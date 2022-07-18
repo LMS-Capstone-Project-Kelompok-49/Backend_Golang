@@ -4,44 +4,48 @@ import (
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/model"
 )
 
-type Mentor struct {
-	Name        string
-	Job         string
-	Description string
-}
-
-type CatResponse struct {
-	Category string
+type MentorResponse struct {
+	Name        string `json:"name"`
+	Job         string `json:"job"`
+	Description string `json:"description"`
 }
 
 type MaterialResponse struct {
-	Title       string
-	Description string
-	Video       string
-	PPT         string
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Video       string `json:"video"`
+	PPT         string `json:"ppt"`
 }
 
 type CoursesResponse struct {
-	CourseID     int
-	CourseName   string
-	CourseTypeID string
-	CourseMentor string
+	CourseID       int     `json:"course_id"`
+	CourseName     string  `json:"course_name"`
+	CourseMentor   string  `json:"course_mentor"`
+	CourseCategory string  `json:"course_category"`
+	Rating         float32 `json:"rating"`
+	TotalVideo     int     `json:"total_video"`
+	TotalMember    int     `json:"total_member"`
+	Price          int     `json:"price"`
 }
 
 type CourseResponse struct {
-	ID          int
-	Title       string
-	Description string
-	Category    string
-	Media       string
-	Mentor      Mentor
-	Material    []MaterialResponse
+	ID          int                `json:"id"`
+	Title       string             `json:"title"`
+	Description string             `json:"description"`
+	Category    string             `json:"category"`
+	Media       string             `json:"media"`
+	Mentor      MentorResponse     `json:"mentor"`
+	Material    []MaterialResponse `json:"material"`
+	Benefit     string             `json:"benefit"`
+	Rating      string             `json:"rating"`
+	TotalVideo  int                `json:"total_video"`
+	Price       int                `json:"price"`
 }
 
 type CreateResponse struct {
-	CourseName  string
-	Description string
-	Avatar      string
+	CourseName  string `json:"course_name"`
+	Description string `json:"description"`
+	Avatar      string `json:"avatar"`
 }
 
 func createResponse(model model.Course) CreateResponse {
@@ -52,27 +56,30 @@ func createResponse(model model.Course) CreateResponse {
 	}
 }
 
-func getCourses(model model.Course) CoursesResponse {
+func getCourses(model model.Course, cr CoursesResponse) CoursesResponse {
 	return CoursesResponse{
-		CourseID:     model.CourseID,
-		CourseName:   model.CourseName,
-		CourseMentor: model.User.Name,
+		CourseID:       model.CourseID,
+		CourseName:     model.CourseName,
+		CourseMentor:   model.User.Profile.Fullname,
+		CourseCategory: cr.CourseCategory,
+		TotalVideo:     cr.TotalVideo,
 	}
 }
 
-func getCourse(model model.Course, material []MaterialResponse, cat CatResponse) CourseResponse {
+func getCourse(model model.Course, cr CourseResponse) CourseResponse {
 	return CourseResponse{
 		ID:          model.CourseID,
 		Title:       model.CourseName,
 		Description: model.CourseDetail.Description,
 		Media:       model.CourseDetail.Media,
-		Category:    cat.Category,
-		Mentor: Mentor{
-			Name:        model.User.Name,
-			Job:         model.User.Name,
-			Description: model.User.Name,
+		Category:    cr.Category,
+		Mentor: MentorResponse{
+			Name:        model.User.Profile.Fullname,
+			Job:         model.User.Profile.Job,
+			Description: model.User.Profile.Description,
 		},
-		Material: material,
+		Material:   cr.Material,
+		TotalVideo: cr.TotalVideo,
 	}
 }
 

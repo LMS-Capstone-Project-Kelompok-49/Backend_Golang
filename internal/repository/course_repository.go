@@ -39,14 +39,14 @@ func (cr *courseRepoLayer) Update(id int, course model.Course) error {
 func (cr *courseRepoLayer) GetAll() []model.Course {
 	courses := []model.Course{}
 	// cr.DB.Find(&courses)
-	cr.DB.Preload("User").Find(&courses)
+	cr.DB.Preload("User.Profile").Preload("CourseDetail").Preload("Material").Find(&courses)
 
 	return courses
 }
 
 // GetByID implements domain.CourseRepository
 func (cr *courseRepoLayer) GetByID(id int) (course model.Course, err error) {
-	res := cr.DB.Where("course_id = ?", id).Preload("User").Preload("Material").Preload("CourseDetail").First(&course)
+	res := cr.DB.Where("course_id = ?", id).Preload("User.Profile").Preload("Material").Preload("CourseDetail").First(&course)
 	if res.RowsAffected < 1 {
 		err = fmt.Errorf("not found")
 	}
