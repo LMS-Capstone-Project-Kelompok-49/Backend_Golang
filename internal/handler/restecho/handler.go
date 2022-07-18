@@ -166,11 +166,14 @@ func RegisterTypeCategoryGroupAPI(e *echo.Echo, conf config.Config) {
 func RegisterMaterialGroupAPI(e *echo.Echo, conf config.Config) {
 	db := database.InitDB(conf)
 	repo := repository.NewMaterialRepository(db)
+	cRepo := repository.NewCourseRepository(db)
 
 	svc := service.NewMaterialService(repo)
+	cSvc := service.NewCourseService(cRepo)
 
 	cont := material.MaterialController{
-		Service: svc,
+		Service:       svc,
+		CourseService: cSvc,
 	}
 
 	authMaterial := e.Group("/material",
@@ -178,7 +181,7 @@ func RegisterMaterialGroupAPI(e *echo.Echo, conf config.Config) {
 		middleware.CORS(),
 	)
 
-	// authMaterial.Use(middleware.JWT([]byte(conf.JWT_KEY)))
+	authMaterial.Use(middleware.JWT([]byte(conf.JWT_KEY)))
 
 	//authMaterial handler
 	authMaterial.POST("/create/:courseid", cont.CreateMaterial)

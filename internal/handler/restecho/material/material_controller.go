@@ -105,9 +105,11 @@ func (mc *MaterialController) EditMaterial(c echo.Context) error {
 
 	//cek mentor
 	courseid := data.CourseID
-	mentor, err := mc.CourseService.GetOneCourse(courseid)
+
 	bearer := c.Get("user").(*jwt.Token)
 	claim := bearer.Claims.(jwt.MapClaims)
+
+	mentor, err := mc.CourseService.GetOneCourse(courseid)
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
@@ -232,7 +234,14 @@ func (mc *MaterialController) DeleteMaterial(c echo.Context) error {
 
 func (mc *MaterialController) GetMaterials(c echo.Context) error {
 	courseid, _ := strconv.Atoi(c.Param("courseid"))
-	materials := mc.Service.GetAllByCourseID(courseid)
+	materials, err := mc.Service.GetAllByCourseID(courseid)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": "no id or deleted",
+		})
+	}
+
 	return c.JSONPretty(http.StatusOK, map[string]interface{}{
 		"messages":  "success",
 		"materials": materials,
@@ -241,6 +250,7 @@ func (mc *MaterialController) GetMaterials(c echo.Context) error {
 
 func (mc *MaterialController) GetMaterial(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
+
 	res, err := mc.Service.GetOneMaterial(id)
 
 	if err != nil {
@@ -251,6 +261,6 @@ func (mc *MaterialController) GetMaterial(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"messages": "success",
-		"users":    res,
+		"material": res,
 	})
 }

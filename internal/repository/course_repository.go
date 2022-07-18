@@ -14,7 +14,8 @@ type courseRepoLayer struct {
 
 // Delete implements domain.CourseRepository
 func (cr *courseRepoLayer) Delete(id int) error {
-	res := cr.DB.Delete(&model.Course{
+
+	res := cr.DB.Select("Material").Delete(&model.Course{
 		CourseID: id,
 	})
 

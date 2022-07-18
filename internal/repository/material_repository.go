@@ -33,20 +33,21 @@ func (mr *materialRepoLayer) Delete(id int) error {
 }
 
 // GetAll implements domain.MaterialRepository
-func (mr *materialRepoLayer) GetAll(courseid int) []model.Material {
-	materials := []model.Material{}
-	mr.DB.Where("course_id = ?", courseid).Find(&materials)
-
-	return materials
+func (mr *materialRepoLayer) GetAll(courseid int) (materials []model.Material, err error) {
+	res := mr.DB.Where("course_id = ?", courseid).Find(&materials)
+	if res.RowsAffected < 1 {
+		return materials, fmt.Errorf("error delete material")
+	}
+	return materials, nil
 }
 
 // GetByID implements domain.MaterialRepository
 func (mr *materialRepoLayer) GetByID(id int) (material model.Material, err error) {
-	res := mr.DB.Where("material_id = ?", id).First(&material)
-	if res.RowsAffected < 1 {
-		err = fmt.Errorf("not found")
+	err = mr.DB.Where("material_id = ?", id).First(&material).Error
+	if err != nil {
+		return material, fmt.Errorf("not found")
 	}
-	return
+	return material, nil
 }
 
 // Update implements domain.MaterialRepository

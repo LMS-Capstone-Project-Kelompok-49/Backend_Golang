@@ -15,5 +15,6 @@ type Course struct {
 	MentorID     int            `json:"-"`
 	User         User           `gorm:"foreignKey:MentorID"`
 	CourseDetail CourseDetail
-	Material     []Material
+	Material     []Material `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Rating       []Rating
 }
