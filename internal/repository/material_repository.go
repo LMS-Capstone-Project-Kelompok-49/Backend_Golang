@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/domain"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/model"
@@ -14,6 +15,8 @@ type materialRepoLayer struct {
 
 // Create implements domain.MaterialRepository
 func (mr *materialRepoLayer) Create(material model.Material) error {
+	re := mr.DB.Model(&model.Course{}).Association("CourseID")
+	log.Println(re)
 	res := mr.DB.Create(&material)
 	if res.RowsAffected < 1 {
 		return fmt.Errorf("error create material")

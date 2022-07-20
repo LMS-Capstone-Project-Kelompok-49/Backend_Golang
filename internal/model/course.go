@@ -16,5 +16,5 @@ type Course struct {
 	User         User           `gorm:"foreignKey:MentorID"`
 	CourseDetail CourseDetail
 	Material     []Material `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Rating       []Rating
+	Rating       []Rating   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }

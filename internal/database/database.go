@@ -38,10 +38,10 @@ func InitDB(conf config.Config) *gorm.DB {
 	})
 
 	DB.Create(&model.User{
-		RoleID:    1,
-		UserID:    1,
-		Email:     "Admin",
-		Password:  "Admin",
+		RoleID:   1,
+		UserID:   1,
+		Email:    "Admin",
+		Password: "Admin",
 	})
 
 	DB.Create(&model.CourseType{
@@ -75,6 +75,7 @@ func InitDB(conf config.Config) *gorm.DB {
 		&model.Material{},
 		&model.CourseCategory{},
 		&model.CourseDetail{},
+		&model.Rating{},
 	)
 	return DB
 }

@@ -65,6 +65,7 @@ func (cd *CourseDetailController) EditDetail(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"messages": "bad request",
+			"error":    err.Error(),
 		})
 	}
 

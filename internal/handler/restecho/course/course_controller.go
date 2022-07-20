@@ -2,6 +2,7 @@ package restecho
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -107,6 +108,7 @@ func (cc *CourseController) EditCourse(c echo.Context) error {
 			"messages": "no id or no change or unauthorization",
 		})
 	}
+	log.Print("hahahah")
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"messages":  "edited",
@@ -150,6 +152,8 @@ func (cc *CourseController) DeleteCourse(c echo.Context) error {
 
 func (cc *CourseController) GetCourses(c echo.Context) error {
 	courses := cc.Service.GetAllCourses()
+	log.Println(1)
+
 	data := []CoursesResponse{}
 
 	for i := range courses {
@@ -158,19 +162,37 @@ func (cc *CourseController) GetCourses(c echo.Context) error {
 		catData := cc.CatService.GetOneCategory(catId)
 
 		count := 0
+		rating := 0.0
+		panjangRating := len(courses[i].Rating)
+		totalRating := 0.0
+		log.Println(panjangRating)
 
 		for j := range courses[i].Material {
 			if courses[i].Material[j].Video != "" {
 				count++
 			}
+
+		}
+
+		if panjangRating != 0 {
+			for k := range courses[i].Rating {
+				totalRating += courses[i].Rating[k].Rating
+			}
+
+			rating = totalRating / float64(panjangRating)
+			log.Println(rating)
+		} else {
+			rating = 0.0
 		}
 
 		cat := CoursesResponse{
 			CourseCategory: catData.Category,
 			TotalVideo:     count,
+			Rating:         rating,
 		}
 		data = append(data, getCourses(courses[i], cat))
 	}
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"status":   http.StatusOK,
 		"messages": "berhasil",
@@ -198,6 +220,7 @@ func (cc *CourseController) GetCourse(c echo.Context) error {
 			count++
 		}
 	}
+	log.Println(1)
 
 	courseResponse.TotalVideo = count
 
@@ -206,6 +229,7 @@ func (cc *CourseController) GetCourse(c echo.Context) error {
 			"messages": "no id or deleted",
 		})
 	}
+	log.Println(2)
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"messages": "success",

@@ -26,6 +26,14 @@ func (mc *MaterialController) CreateMaterial(c echo.Context) error {
 	courseid, _ := strconv.Atoi(c.Param("courseid"))
 	c.Bind(&material)
 
+	_, err := mc.CourseService.GetOneCourse(courseid)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": fmt.Sprintf("no course with id %d", courseid),
+		})
+	}
+
 	//cek mentor
 	// mentor, err := mc.CourseService.GetOneCourse(courseid)
 	// bearer := c.Get("user").(*jwt.Token)

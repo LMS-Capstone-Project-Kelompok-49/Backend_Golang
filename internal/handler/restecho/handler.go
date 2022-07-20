@@ -12,6 +12,7 @@ import (
 	course_t "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/course_type"
 	material "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/material"
 	profile "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/profile"
+	rating "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/rating"
 	role "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/role"
 	user "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/user"
 
@@ -189,7 +190,10 @@ func RegisterMaterialGroupAPI(e *echo.Echo, conf config.Config) {
 	authMaterial.DELETE("/delete/:id", cont.DeleteMaterial)
 	//--
 
-	materialGroup := e.Group("/material")
+	materialGroup := e.Group("/material",
+		middleware.Logger(),
+		middleware.CORS(),
+	)
 
 	//material handler
 	materialGroup.GET("/course/:courseid", cont.GetMaterials)
@@ -241,4 +245,36 @@ func RegisterCourseDetailAPI(e *echo.Echo, conf config.Config) {
 
 	detailGroup.PUT("/detail/edit/:course_id", cont.EditDetail)
 	detailGroup.GET("/detail/:course_id", cont.GetByID)
+}
+
+func RegisterRatingAPI(e *echo.Echo, conf config.Config) {
+	db := database.InitDB(conf)
+	repo := repository.NewRatingRepository(db)
+	cRepo := repository.NewCourseRepository(db)
+	svc := service.NewRatingService(repo)
+	cSvc := service.NewCourseService(cRepo)
+
+	cont := rating.RatingController{
+		Service:       svc,
+		CourseService: cSvc,
+	}
+
+	ratingAuth := e.Group("/course/rating",
+		middleware.Logger(),
+		middleware.CORS(),
+	)
+
+	ratingAuth.Use(middleware.JWT([]byte(conf.JWT_KEY)))
+
+	ratingAuth.POST("/create/:course_id", cont.Create)
+	ratingAuth.PUT("/edit/:id", cont.Update)
+	ratingAuth.DELETE("/delete/:id", cont.Delete)
+
+	ratingGroup := e.Group("/course/rating",
+		middleware.Logger(),
+		middleware.CORS(),
+	)
+
+	ratingGroup.GET("/:course_id", cont.GetByCourse)
+	ratingGroup.GET("/user/:id", cont.GetByID)
 }

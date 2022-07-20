@@ -22,7 +22,7 @@ type CoursesResponse struct {
 	CourseName     string  `json:"course_name"`
 	CourseMentor   string  `json:"course_mentor"`
 	CourseCategory string  `json:"course_category"`
-	Rating         float32 `json:"rating"`
+	Rating         float64 `json:"rating"`
 	TotalVideo     int     `json:"total_video"`
 	TotalMember    int     `json:"total_member"`
 	Price          int     `json:"price"`
@@ -37,7 +37,7 @@ type CourseResponse struct {
 	Mentor      MentorResponse     `json:"mentor"`
 	Material    []MaterialResponse `json:"material"`
 	Benefit     string             `json:"benefit"`
-	Rating      string             `json:"rating"`
+	Rating      float64            `json:"rating"`
 	TotalVideo  int                `json:"total_video"`
 	Price       int                `json:"price"`
 }
@@ -63,6 +63,7 @@ func getCourses(model model.Course, cr CoursesResponse) CoursesResponse {
 		CourseMentor:   model.User.Profile.Fullname,
 		CourseCategory: cr.CourseCategory,
 		TotalVideo:     cr.TotalVideo,
+		Rating:         cr.Rating,
 	}
 }
 

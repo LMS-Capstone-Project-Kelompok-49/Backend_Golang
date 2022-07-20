@@ -37,9 +37,9 @@ func main() {
 	rest.RegisterRoleGroupAPI(e, config)
 	rest.RegisterMaterialGroupAPI(e, config)
 	rest.RegisterCourseCategoryGroupAPI(e, config)
-	rest.RegisterTypeCategoryGroupAPI(e, config)
 	rest.RegisterProfileGroupAPI(e, config)
 	rest.RegisterCourseDetailAPI(e, config)
+	rest.RegisterRatingAPI(e, config)
 
 	e.Logger.Fatal(e.Start(":8000"))
 }

@@ -24,7 +24,9 @@ func (cs *courseService) Edit(id int, course model.Course) error {
 
 // GetAllCourses implements domain.CourseService
 func (cs *courseService) GetAllCourses() []model.Course {
-	return cs.repo.GetAll()
+	res := cs.repo.GetAll()
+
+	return res
 }
 
 // GetOneCourse implements domain.CourseService
