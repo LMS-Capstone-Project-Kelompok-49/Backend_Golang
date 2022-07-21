@@ -52,10 +52,13 @@ func RegisterUserGroupAPI(e *echo.Echo, conf config.Config) {
 func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
 	db := database.InitDB(conf)
 	repo := repository.NewCourseRepository(db)
+	prepo := repository.NewProfileRepository(db)
 	catRepo := repository.NewCourseCategoryRepository(db)
+	eRepo := repository.NewEnrollmentRepository(db)
 
-	svc := service.NewCourseService(repo)
+	svc := service.NewCourseService(repo, prepo)
 	catSvc := service.NewCourseCategoryService(catRepo)
+	eSvc := service.NewEnrollmentService(eRepo, repo)
 
 	cont := course.CourseController{
 		Service:    svc,
@@ -81,6 +84,22 @@ func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
 	//course handler
 	courseGroup.GET("/course/all", cont.GetCourses)
 	courseGroup.GET("/course/:course_id", cont.GetCourse)
+
+	//------------------ user
+
+	eCont := course.UserCourseController{
+		Service:  svc,
+		EService: eSvc,
+	}
+
+	enrCourse := e.Group("/join",
+		middleware.Logger(),
+		middleware.CORS(),
+	)
+
+	enrCourse.Use(middleware.JWT([]byte(conf.JWT_KEY)))
+
+	enrCourse.POST("/:course_id", eCont.JoinCourse)
 }
 
 func RegisterRoleGroupAPI(e *echo.Echo, conf config.Config) {
@@ -167,10 +186,12 @@ func RegisterTypeCategoryGroupAPI(e *echo.Echo, conf config.Config) {
 func RegisterMaterialGroupAPI(e *echo.Echo, conf config.Config) {
 	db := database.InitDB(conf)
 	repo := repository.NewMaterialRepository(db)
+	prepo := repository.NewProfileRepository(db)
+
 	cRepo := repository.NewCourseRepository(db)
 
 	svc := service.NewMaterialService(repo)
-	cSvc := service.NewCourseService(cRepo)
+	cSvc := service.NewCourseService(cRepo, prepo)
 
 	cont := material.MaterialController{
 		Service:       svc,
@@ -250,9 +271,10 @@ func RegisterCourseDetailAPI(e *echo.Echo, conf config.Config) {
 func RegisterRatingAPI(e *echo.Echo, conf config.Config) {
 	db := database.InitDB(conf)
 	repo := repository.NewRatingRepository(db)
+	prepo := repository.NewProfileRepository(db)
 	cRepo := repository.NewCourseRepository(db)
 	svc := service.NewRatingService(repo)
-	cSvc := service.NewCourseService(cRepo)
+	cSvc := service.NewCourseService(cRepo, prepo)
 
 	cont := rating.RatingController{
 		Service:       svc,

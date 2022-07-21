@@ -13,8 +13,10 @@ type Course struct {
 	CourseID     int            `gorm:"primary_key ; AUTO_INCREMENT" json:"-"`
 	CourseName   string         `json:"coursename" form:"coursename"`
 	MentorID     int            `json:"-"`
-	User         User           `gorm:"foreignKey:MentorID"`
+	Code         string         `json:"-"`
+	Mentor       User
 	CourseDetail CourseDetail
+	Student      []Enrollment
 	Material     []Material `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Rating       []Rating   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }

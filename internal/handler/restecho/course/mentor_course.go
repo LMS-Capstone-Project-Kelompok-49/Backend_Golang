@@ -58,17 +58,20 @@ func (cc *CourseController) CreateCourse(c echo.Context) error {
 		temp.Avatar = url
 	}
 
+	randCode := GetCode()
+
 	course := model.Course{}
 	course = toModelCourse(temp)
 	course.CourseDetail = toModelDetail(temp)
 	course.CourseDetail.CategoryID = 99
 
 	course.MentorID = mentorID
+	course.Code = randCode
 
 	rescode, err := cc.Service.Store(course)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"messages": err.Error(),
 			"status":   rescode,
 		})
@@ -96,7 +99,7 @@ func (cc *CourseController) EditCourse(c echo.Context) error {
 		})
 	}
 
-	if int(claim["id"].(float64)) != cekMentor.User.UserID || int(claim["role"].(float64)) != 1 { //role 1 = admin
+	if int(claim["id"].(float64)) != cekMentor.Mentor.UserID || int(claim["role"].(float64)) != 1 { //role 1 = admin
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
 			"messages": "unauthorized",
 		})
@@ -223,6 +226,7 @@ func (cc *CourseController) GetCourse(c echo.Context) error {
 	log.Println(1)
 
 	courseResponse.TotalVideo = count
+	courseResponse.TotalMember = len(res.Student)
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{

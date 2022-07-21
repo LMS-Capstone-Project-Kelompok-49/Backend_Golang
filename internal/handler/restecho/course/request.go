@@ -10,6 +10,10 @@ type CourseRequest struct {
 	Avatar      string `json:"avatar" form:"avatar"`
 }
 
+type JoinRequest struct {
+	Code string `json:"code" form:"code" validate:"required"`
+}
+
 func toModelCourse(cr CourseRequest) model.Course {
 	return model.Course{
 		CourseName: cr.CourseName,

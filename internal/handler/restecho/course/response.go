@@ -39,6 +39,7 @@ type CourseResponse struct {
 	Benefit     string             `json:"benefit"`
 	Rating      float64            `json:"rating"`
 	TotalVideo  int                `json:"total_video"`
+	TotalMember int                `json:"total_member"`
 	Price       int                `json:"price"`
 }
 
@@ -60,7 +61,7 @@ func getCourses(model model.Course, cr CoursesResponse) CoursesResponse {
 	return CoursesResponse{
 		CourseID:       model.CourseID,
 		CourseName:     model.CourseName,
-		CourseMentor:   model.User.Profile.Fullname,
+		CourseMentor:   model.Mentor.Profile.Fullname,
 		CourseCategory: cr.CourseCategory,
 		TotalVideo:     cr.TotalVideo,
 		Rating:         cr.Rating,
@@ -75,19 +76,20 @@ func getCourse(model model.Course, cr CourseResponse) CourseResponse {
 		Media:       model.CourseDetail.Media,
 		Category:    cr.Category,
 		Mentor: MentorResponse{
-			Name:        model.User.Profile.Fullname,
-			Job:         model.User.Profile.Job,
-			Description: model.User.Profile.Description,
+			Name:        model.Mentor.Profile.Fullname,
+			Job:         model.Mentor.Profile.Job,
+			Description: model.Mentor.Profile.Description,
 		},
-		Material:   cr.Material,
-		TotalVideo: cr.TotalVideo,
+		Material:    cr.Material,
+		TotalVideo:  cr.TotalVideo,
+		TotalMember: cr.TotalMember,
 	}
 }
 
 func getMaterial(model model.Material) MaterialResponse {
 	return MaterialResponse{
 		Title:       model.MaterialName,
-		Description: model.MaterialName,
+		Description: model.Description,
 		Video:       model.Video,
 		PPT:         model.PPT,
 	}

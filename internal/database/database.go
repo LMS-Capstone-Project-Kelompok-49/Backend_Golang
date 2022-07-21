@@ -44,15 +44,6 @@ func InitDB(conf config.Config) *gorm.DB {
 		Password: "Admin",
 	})
 
-	DB.Create(&model.CourseType{
-		CourseTypeID: 1,
-		CourseType:   "Lifetime",
-	})
-	DB.Create(&model.CourseType{
-		CourseTypeID: 2,
-		CourseType:   "Bootcamp",
-	})
-
 	DB.Create(&model.CourseCategory{
 		CourseCategoryID: 1,
 		Category:         "Website",
@@ -76,6 +67,7 @@ func InitDB(conf config.Config) *gorm.DB {
 		&model.CourseCategory{},
 		&model.CourseDetail{},
 		&model.Rating{},
+		&model.Enrollment{},
 	)
 	return DB
 }

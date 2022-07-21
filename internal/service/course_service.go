@@ -1,15 +1,16 @@
 package service
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/domain"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/model"
-	"gopkg.in/go-playground/validator.v9"
 )
 
 type courseService struct {
-	repo domain.CourseRepository
+	repo  domain.CourseRepository
+	pRepo domain.ProfileRepository
 }
 
 // Delete implements domain.CourseService
@@ -36,16 +37,16 @@ func (cs *courseService) GetOneCourse(id int) (model.Course, error) {
 
 // Store implements domain.CourseService
 func (cs *courseService) Store(course model.Course) (int, error) {
-	validate := validator.New()
-	err := validate.Struct(course)
+	_, err := cs.pRepo.GetByID(course.MentorID)
 	if err != nil {
-		return http.StatusBadRequest, err
+		return 400, fmt.Errorf("lengkapi profil dahulu")
 	}
 	return http.StatusOK, cs.repo.Create(course)
 }
 
-func NewCourseService(repo domain.CourseRepository) domain.CourseService {
+func NewCourseService(repo domain.CourseRepository, prepo domain.ProfileRepository) domain.CourseService {
 	return &courseService{
-		repo: repo,
+		repo:  repo,
+		pRepo: prepo,
 	}
 }

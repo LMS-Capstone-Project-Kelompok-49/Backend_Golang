@@ -26,7 +26,7 @@ func (mc *MaterialController) CreateMaterial(c echo.Context) error {
 	courseid, _ := strconv.Atoi(c.Param("courseid"))
 	c.Bind(&material)
 
-	_, err := mc.CourseService.GetOneCourse(courseid)
+	data, err := mc.CourseService.GetOneCourse(courseid)
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
@@ -35,22 +35,21 @@ func (mc *MaterialController) CreateMaterial(c echo.Context) error {
 	}
 
 	//cek mentor
-	// mentor, err := mc.CourseService.GetOneCourse(courseid)
-	// bearer := c.Get("user").(*jwt.Token)
-	// claim := bearer.Claims.(jwt.MapClaims)
+	bearer := c.Get("user").(*jwt.Token)
+	claim := bearer.Claims.(jwt.MapClaims)
 
-	// if err != nil {
-	// 	return c.JSON(http.StatusNotFound, map[string]interface{}{
-	// 		"messages": "no id or no change or unauthorization",
-	// 	})
-	// }
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": "no id or no change or unauthorization",
+		})
+	}
 
-	// if mentor.MentorID != int(claim["id"].(float64)) {
-	// 	return c.JSON(http.StatusUnauthorized, map[string]interface{}{
-	// 		"messages": "unauthorized",
-	// 		"status":   http.StatusUnauthorized,
-	// 	})
-	// }
+	if data.MentorID != int(claim["id"].(float64)) {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"messages": "unauthorized",
+			"status":   http.StatusUnauthorized,
+		})
+	}
 
 	currentTime := time.Now().Format("2006#01#02#15#04#05")
 	code := strings.ReplaceAll(currentTime, "#", "")
@@ -125,7 +124,7 @@ func (mc *MaterialController) EditMaterial(c echo.Context) error {
 		})
 	}
 
-	if mentor.User.UserID != int(claim["id"].(float64)) {
+	if mentor.Mentor.UserID != int(claim["id"].(float64)) {
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
 			"messages": "unauthorized",
 			"status":   http.StatusUnauthorized,
@@ -200,7 +199,7 @@ func (mc *MaterialController) DeleteMaterial(c echo.Context) error {
 		})
 	}
 
-	if mentor.User.UserID != int(claim["id"].(float64)) {
+	if mentor.Mentor.UserID != int(claim["id"].(float64)) {
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
 			"messages": "unauthorized",
 			"status":   http.StatusUnauthorized,
