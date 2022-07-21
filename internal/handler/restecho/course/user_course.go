@@ -54,3 +54,64 @@ func (cc *UserCourseController) JoinCourse(c echo.Context) error {
 		"messages": "success",
 	})
 }
+
+func (cc *UserCourseController) GetByID(c echo.Context) error {
+	courses := []UserDashboardCourse{}
+
+	bearer := c.Get("user").(*jwt.Token)
+	claim := bearer.Claims.(jwt.MapClaims)
+	user_id := int(claim["id"].(float64))
+
+	res, err := cc.EService.GetAllByUser(user_id)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"messages": "error",
+			"reason":   err,
+		})
+	}
+
+	for i := range res {
+		course, _ := cc.Service.GetOneCourse(res[i].CourseID)
+
+		totalMember := len(course.Student)
+		totalMaterial := len(course.Material)
+
+		progress := (float64(res[i].Progress) / float64(totalMaterial)) * 100
+
+		udc := UserDashboardCourse{
+			TotalMember:   totalMember,
+			TotalMaterial: totalMaterial,
+			Progress:      int(progress),
+		}
+
+		courses = append(courses, getUserCourse(course, udc))
+	}
+
+	return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		"messages": "berhasil",
+		"data":     courses,
+	})
+}
+
+func (cc *UserCourseController) Update(c echo.Context) error {
+	bearer := c.Get("user").(*jwt.Token)
+	claim := bearer.Claims.(jwt.MapClaims)
+	user_id := int(claim["id"].(float64))
+
+	course_id, _ := strconv.Atoi(c.Param("course_id"))
+	enr := model.Enrollment{}
+
+	err := cc.EService.Update(user_id, course_id, enr)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"messages": "error",
+			"reason":   err,
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"messages": "berhasil",
+	})
+}

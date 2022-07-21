@@ -24,4 +24,6 @@ type Enrollment struct {
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 	UserID    int
 	CourseID  int
+	Status    string
+	Progress  int
 }

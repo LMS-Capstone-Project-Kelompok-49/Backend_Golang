@@ -240,3 +240,47 @@ func (cc *CourseController) GetCourse(c echo.Context) error {
 		"data":     getCourse(res, courseResponse),
 	})
 }
+
+func (cc *CourseController) GetCourseDash(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("course_id"))
+
+	res, err := cc.Service.GetOneCourse(id)
+
+	catId := res.CourseDetail.CategoryID
+
+	catData := cc.CatService.GetOneCategory(catId)
+
+	courseResponse := CourseResponseDash{}
+	courseResponse.Category = catData.Category
+
+	count := 0
+
+	for i := range res.Material {
+		courseResponse.Material = append(courseResponse.Material, getMaterial(res.Material[i]))
+		if res.Material[i].Video != "" {
+			count++
+		}
+	}
+
+	for j := range res.Assignment {
+		courseResponse.Assignment = append(courseResponse.Assignment, getAssignment(res.Assignment[j]))
+	}
+
+	log.Println(courseResponse.Assignment)
+	log.Println(1)
+
+	courseResponse.TotalVideo = count
+	courseResponse.TotalMember = len(res.Student)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": "no id or deleted",
+		})
+	}
+	log.Println(2)
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"messages": "success",
+		"data":     getCourseDash(res, courseResponse),
+	})
+}

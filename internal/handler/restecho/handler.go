@@ -6,6 +6,7 @@ import (
 
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/config"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/database"
+	assignment "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/assignment"
 	course "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/course"
 	course_cat "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/course_cat"
 	detail "github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/handler/restecho/course_detail"
@@ -85,6 +86,10 @@ func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
 	courseGroup.GET("/course/all", cont.GetCourses)
 	courseGroup.GET("/course/:course_id", cont.GetCourse)
 
+	//------------------ mentor
+	courseMentor := e.Group("/mentor")
+	courseMentor.GET("/course/:course_id", cont.GetCourseDash)
+
 	//------------------ user
 
 	eCont := course.UserCourseController{
@@ -92,14 +97,23 @@ func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
 		EService: eSvc,
 	}
 
-	enrCourse := e.Group("/join",
+	enrCourse := e.Group("/enrollment",
 		middleware.Logger(),
 		middleware.CORS(),
 	)
 
 	enrCourse.Use(middleware.JWT([]byte(conf.JWT_KEY)))
 
-	enrCourse.POST("/:course_id", eCont.JoinCourse)
+	enrCourse.POST("/join/:course_id", eCont.JoinCourse)
+	enrCourse.PUT("/update/:course_id", eCont.Update)
+
+	usrDash := e.Group("/user",
+		middleware.Logger(),
+		middleware.CORS(),
+	)
+	usrDash.Use(middleware.JWT([]byte(conf.JWT_KEY)))
+
+	usrDash.GET("/course", eCont.GetByID)
 }
 
 func RegisterRoleGroupAPI(e *echo.Echo, conf config.Config) {
@@ -299,4 +313,29 @@ func RegisterRatingAPI(e *echo.Echo, conf config.Config) {
 
 	ratingGroup.GET("/:course_id", cont.GetByCourse)
 	ratingGroup.GET("/user/:id", cont.GetByID)
+}
+
+func RegisterAssignmentAPI(e *echo.Echo, conf config.Config) {
+	db := database.InitDB(conf)
+	repo := repository.NewAssignmentMentorRepository(db)
+	svc := service.NewAssignmentMentorService(repo)
+
+	cont := assignment.AssignmentMentorController{
+		Service: svc,
+	}
+
+	//----mentor
+
+	assignmentMentor := e.Group("/mentor/assignment",
+		middleware.Logger(),
+		middleware.CORS(),
+	)
+
+	assignmentMentor.Use(middleware.JWT([]byte(conf.JWT_KEY)))
+
+	assignmentMentor.POST("/create/:course_id", cont.CreateAssignment)
+	assignmentMentor.PUT("/update/:id", cont.EditAssignment)
+	assignmentMentor.DELETE("/delete/:id", cont.DeleteAssignment)
+	assignmentMentor.GET("/:id", cont.GetAssignment)
+
 }

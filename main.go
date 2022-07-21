@@ -40,6 +40,7 @@ func main() {
 	rest.RegisterProfileGroupAPI(e, config)
 	rest.RegisterCourseDetailAPI(e, config)
 	rest.RegisterRatingAPI(e, config)
+	rest.RegisterAssignmentAPI(e, config)
 
 	e.Logger.Fatal(e.Start(":8000"))
 }

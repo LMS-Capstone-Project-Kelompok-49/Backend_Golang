@@ -46,7 +46,7 @@ func (cr *courseRepoLayer) GetAll() []model.Course {
 
 // GetByID implements domain.CourseRepository
 func (cr *courseRepoLayer) GetByID(id int) (course model.Course, err error) {
-	res := cr.DB.Where("course_id = ?", id).Preload("Mentor.Profile").Preload("Material").Preload("CourseDetail").Preload("Rating").Preload("Student").First(&course)
+	res := cr.DB.Where("course_id = ?", id).Preload("Mentor.Profile").Preload("Material").Preload("CourseDetail").Preload("Rating").Preload("Student").Preload("Assignment").First(&course)
 	if res.RowsAffected < 1 {
 		err = fmt.Errorf("not found")
 	}

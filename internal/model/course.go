@@ -17,6 +17,7 @@ type Course struct {
 	Mentor       User
 	CourseDetail CourseDetail
 	Student      []Enrollment
-	Material     []Material `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Rating       []Rating   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Material     []Material         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Assignment   []AssignmentMentor `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Rating       []Rating           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
