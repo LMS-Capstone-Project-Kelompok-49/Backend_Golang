@@ -1,5 +1,7 @@
-FROM golang:1.17-alpine
-
+FROM golang:1.17-buster
+RUN apt-get update && \
+    apt-get install -y git ca-certificates tzdata && \
+    update-ca-certificates
 WORKDIR /app
 
 COPY go.mod ./
