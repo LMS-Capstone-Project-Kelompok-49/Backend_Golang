@@ -30,6 +30,9 @@ func main() {
 		})
 	})
 
+	e.GET("/.well-known/pki-validation/74A1B9BE28184B29ABE69EFFC2F14A2C.txt", func(c echo.Context) error {
+		return c.String(http.StatusOK, "BC4E1CFF88134A28F3F6669E3BC13FB27C4AE54B605EC93650A241FCD2DBC261\ncomodoca.com\na90772fd87168ef")
+	})
 	os.Mkdir("temp", 0755)
 
 	rest.RegisterUserGroupAPI(e, config)
