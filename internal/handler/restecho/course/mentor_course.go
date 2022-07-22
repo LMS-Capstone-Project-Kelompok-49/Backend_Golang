@@ -19,6 +19,7 @@ import (
 type CourseController struct {
 	Service    domain.CourseService
 	CatService domain.CourseCategoryService
+	RService   domain.RatingService
 }
 
 func (cc *CourseController) CreateCourse(c echo.Context) error {
@@ -207,6 +208,11 @@ func (cc *CourseController) GetCourse(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("course_id"))
 
 	res, err := cc.Service.GetOneCourse(id)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": "no id or deleted",
+		})
+	}
 
 	catId := res.CourseDetail.CategoryID
 
@@ -228,11 +234,17 @@ func (cc *CourseController) GetCourse(c echo.Context) error {
 	courseResponse.TotalVideo = count
 	courseResponse.TotalMember = len(res.Student)
 
-	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]interface{}{
-			"messages": "no id or deleted",
-		})
+	rate, _ := cc.RService.GetByCourse(1)
+	totalRate := len(rate)
+	jumlahRate := 0.0
+	for j := range rate {
+		jumlahRate += rate[j].Rating
 	}
+
+	avgRate := jumlahRate / float64(totalRate)
+
+	courseResponse.Rating = avgRate
+
 	log.Println(2)
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
@@ -261,6 +273,17 @@ func (cc *CourseController) GetCourseDash(c echo.Context) error {
 			count++
 		}
 	}
+
+	rate, _ := cc.RService.GetByCourse(1)
+	totalRate := len(rate)
+	jumlahRate := 0.0
+	for j := range rate {
+		jumlahRate += rate[j].Rating
+	}
+
+	avgRate := jumlahRate / float64(totalRate)
+
+	courseResponse.Rating = avgRate
 
 	for j := range res.Assignment {
 		courseResponse.Assignment = append(courseResponse.Assignment, getAssignment(res.Assignment[j]))

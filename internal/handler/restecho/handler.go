@@ -56,14 +56,17 @@ func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
 	prepo := repository.NewProfileRepository(db)
 	catRepo := repository.NewCourseCategoryRepository(db)
 	eRepo := repository.NewEnrollmentRepository(db)
+	rRepo := repository.NewRatingRepository(db)
 
 	svc := service.NewCourseService(repo, prepo)
 	catSvc := service.NewCourseCategoryService(catRepo)
 	eSvc := service.NewEnrollmentService(eRepo, repo)
+	rSvc := service.NewRatingService(rRepo, eRepo)
 
 	cont := course.CourseController{
 		Service:    svc,
 		CatService: catSvc,
+		RService:   rSvc,
 	}
 
 	authCourse := e.Group("/api",
@@ -96,6 +99,7 @@ func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
 		Service:    svc,
 		EService:   eSvc,
 		CatService: catSvc,
+		RService:   rSvc,
 	}
 
 	enrCourse := e.Group("/enrollment",

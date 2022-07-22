@@ -16,6 +16,7 @@ type UserCourseController struct {
 	Service    domain.CourseService
 	EService   domain.EnrollmentService
 	CatService domain.CourseCategoryService
+	RService   domain.RatingService
 }
 
 func (cc *UserCourseController) JoinCourse(c echo.Context) error {
@@ -105,7 +106,7 @@ func (cc *UserCourseController) GetByID(c echo.Context) error {
 
 	catData := cc.CatService.GetOneCategory(catId)
 
-	courseResponse := CourseResponseDash{}
+	courseResponse := CourseResponseDashUser{}
 	courseResponse.Category = catData.Category
 
 	count := 0
@@ -116,6 +117,17 @@ func (cc *UserCourseController) GetByID(c echo.Context) error {
 			count++
 		}
 	}
+
+	rate, _ := cc.RService.GetByCourse(id)
+	totalRate := len(rate)
+	jumlahRate := 0.0
+	for j := range rate {
+		jumlahRate += rate[j].Rating
+	}
+
+	avgRate := jumlahRate / float64(totalRate)
+
+	courseResponse.Rating = avgRate
 
 	for j := range res.Assignment {
 		courseResponse.Assignment = append(courseResponse.Assignment, getAssignment(res.Assignment[j]))
@@ -136,7 +148,7 @@ func (cc *UserCourseController) GetByID(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"messages": "success",
-		"data":     getCourseDash(res, courseResponse),
+		"data":     getCourseDashUser(res, courseResponse),
 	})
 }
 

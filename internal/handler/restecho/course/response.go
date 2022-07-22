@@ -78,8 +78,25 @@ type CourseResponse struct {
 	Price       int                `json:"price"`
 }
 
+type CourseResponseDashUser struct {
+	ID          int                  `json:"id"`
+	Title       string               `json:"title"`
+	Description string               `json:"description"`
+	Category    string               `json:"category"`
+	Media       string               `json:"media"`
+	Mentor      MentorResponse       `json:"mentor"`
+	Material    []MaterialResponse   `json:"material"`
+	Assignment  []AssignmentResponse `json:"assignment"`
+	Benefit     string               `json:"benefit"`
+	Rating      float64              `json:"rating"`
+	TotalVideo  int                  `json:"total_video"`
+	TotalMember int                  `json:"total_member"`
+	Price       int                  `json:"price"`
+}
+
 type CourseResponseDash struct {
 	ID          int                  `json:"id"`
+	Code        string               `json:"code"`
 	Title       string               `json:"title"`
 	Description string               `json:"description"`
 	Category    string               `json:"category"`
@@ -156,11 +173,33 @@ func getCourse(model model.Course, cr CourseResponse) CourseResponse {
 		Material:    cr.Material,
 		TotalVideo:  cr.TotalVideo,
 		TotalMember: cr.TotalMember,
+		Rating:      cr.Rating,
 	}
 }
 
 func getCourseDash(model model.Course, cr CourseResponseDash) CourseResponseDash {
 	return CourseResponseDash{
+		ID:          model.CourseID,
+		Code:        model.Code,
+		Title:       model.CourseName,
+		Description: model.CourseDetail.Description,
+		Media:       model.CourseDetail.Media,
+		Category:    cr.Category,
+		Mentor: MentorResponse{
+			Name: fmt.Sprintf("%s %s", model.Mentor.Profile.Firstname, model.Mentor.Profile.Lastname),
+			// Job:         model.Mentor.Profile.Job,
+			// Description: model.Mentor.Profile.Description,
+		},
+		Material:    cr.Material,
+		Assignment:  cr.Assignment,
+		TotalVideo:  cr.TotalVideo,
+		TotalMember: cr.TotalMember,
+		Rating:      cr.Rating,
+	}
+}
+
+func getCourseDashUser(model model.Course, cr CourseResponseDashUser) CourseResponseDashUser {
+	return CourseResponseDashUser{
 		ID:          model.CourseID,
 		Title:       model.CourseName,
 		Description: model.CourseDetail.Description,
@@ -175,6 +214,7 @@ func getCourseDash(model model.Course, cr CourseResponseDash) CourseResponseDash
 		Assignment:  cr.Assignment,
 		TotalVideo:  cr.TotalVideo,
 		TotalMember: cr.TotalMember,
+		Rating:      cr.Rating,
 	}
 }
 
