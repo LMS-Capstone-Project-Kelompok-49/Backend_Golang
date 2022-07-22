@@ -1,13 +1,15 @@
 package restecho
 
 import (
+	"fmt"
+
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/model"
 )
 
 type MentorResponse struct {
-	Name        string `json:"name"`
-	Job         string `json:"job"`
-	Description string `json:"description"`
+	Name string `json:"name"`
+	// Job         string `json:"job"`
+	// Description string `json:"description"`
 }
 
 type MaterialResponse struct {
@@ -20,12 +22,14 @@ type MaterialResponse struct {
 type AssignmentResponse struct {
 	AssignmentMentorID int    `json:"assigment_id"`
 	Title              string `json:"title"`
+	Intruction         string `json:"intruction"`
 	Refference         string `json:"refference"`
 	Point              int    `json:"point"`
 }
 
 type CoursesResponse struct {
 	CourseID       int     `json:"course_id"`
+	Avatar         string  `json:"avatar"`
 	CourseName     string  `json:"course_name"`
 	CourseMentor   string  `json:"course_mentor"`
 	CourseCategory string  `json:"course_category"`
@@ -37,6 +41,7 @@ type CoursesResponse struct {
 
 type CourseResponse struct {
 	ID          int                `json:"id"`
+	Avatar      string             `json:"avatar"`
 	Title       string             `json:"title"`
 	Description string             `json:"description"`
 	Category    string             `json:"category"`
@@ -73,19 +78,19 @@ type CreateResponse struct {
 }
 
 type UserDashboardCourse struct {
-	CourseID      int
-	CourseName    string
-	Mentor        string
-	TotalMember   int
-	TotalMaterial int
-	Progress      int
+	CourseID      int    `json:"course_id"`
+	CourseName    string `json:"course_name"`
+	Mentor        string `json:"mentor"`
+	TotalMember   int    `json:"total_member"`
+	TotalMaterial int    `json:"total_material"`
+	Progress      int    `json:"progress"`
 }
 
 func getUserCourse(model model.Course, udc UserDashboardCourse) UserDashboardCourse {
 	return UserDashboardCourse{
 		CourseID:      model.CourseID,
 		CourseName:    model.CourseName,
-		Mentor:        model.Mentor.Profile.Fullname,
+		Mentor:        fmt.Sprintf("%s %s", model.Mentor.Profile.Firstname, model.Mentor.Profile.Lastname),
 		TotalMember:   udc.TotalMember,
 		TotalMaterial: udc.TotalMaterial,
 		Progress:      udc.Progress,
@@ -103,8 +108,9 @@ func createResponse(model model.Course) CreateResponse {
 func getCourses(model model.Course, cr CoursesResponse) CoursesResponse {
 	return CoursesResponse{
 		CourseID:       model.CourseID,
+		Avatar:         model.CourseDetail.Avatar,
 		CourseName:     model.CourseName,
-		CourseMentor:   model.Mentor.Profile.Fullname,
+		CourseMentor:   fmt.Sprintf("%s %s", model.Mentor.Profile.Firstname, model.Mentor.Profile.Lastname),
 		CourseCategory: cr.CourseCategory,
 		TotalVideo:     cr.TotalVideo,
 		Rating:         cr.Rating,
@@ -114,14 +120,15 @@ func getCourses(model model.Course, cr CoursesResponse) CoursesResponse {
 func getCourse(model model.Course, cr CourseResponse) CourseResponse {
 	return CourseResponse{
 		ID:          model.CourseID,
+		Avatar:      model.CourseDetail.Avatar,
 		Title:       model.CourseName,
 		Description: model.CourseDetail.Description,
 		Media:       model.CourseDetail.Media,
 		Category:    cr.Category,
 		Mentor: MentorResponse{
-			Name:        model.Mentor.Profile.Fullname,
-			Job:         model.Mentor.Profile.Job,
-			Description: model.Mentor.Profile.Description,
+			Name: fmt.Sprintf("%s %s", model.Mentor.Profile.Firstname, model.Mentor.Profile.Lastname),
+			// Job:         model.Mentor.Profile.Job,
+			// Description: model.Mentor.Profile.Description,
 		},
 		Material:    cr.Material,
 		TotalVideo:  cr.TotalVideo,
@@ -137,9 +144,9 @@ func getCourseDash(model model.Course, cr CourseResponseDash) CourseResponseDash
 		Media:       model.CourseDetail.Media,
 		Category:    cr.Category,
 		Mentor: MentorResponse{
-			Name:        model.Mentor.Profile.Fullname,
-			Job:         model.Mentor.Profile.Job,
-			Description: model.Mentor.Profile.Description,
+			Name: fmt.Sprintf("%s %s", model.Mentor.Profile.Firstname, model.Mentor.Profile.Lastname),
+			// Job:         model.Mentor.Profile.Job,
+			// Description: model.Mentor.Profile.Description,
 		},
 		Material:    cr.Material,
 		Assignment:  cr.Assignment,
@@ -161,6 +168,7 @@ func getAssignment(model model.AssignmentMentor) AssignmentResponse {
 	return AssignmentResponse{
 		AssignmentMentorID: model.AssignmentMentorID,
 		Title:              model.Title,
+		Intruction:         model.Intruction,
 		Refference:         model.Refference,
 		Point:              model.Point,
 	}

@@ -42,7 +42,7 @@ func (ar *assignmentMentorRepo) GetAll() ([]model.AssignmentMentor, error) {
 
 // GetByID implements domain.AssignmentMentorRepository
 func (ar *assignmentMentorRepo) GetByID(id int) (tugas model.AssignmentMentor, err error) {
-	err = ar.DB.Where("assignment_mentor_id = ?", id).First(&tugas).Error
+	err = ar.DB.Where("assignment_mentor_id = ?", id).Preload("AssignmentUser").First(&tugas).Error
 	if err != nil {
 		return tugas, err
 	}

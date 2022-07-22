@@ -318,10 +318,17 @@ func RegisterRatingAPI(e *echo.Echo, conf config.Config) {
 func RegisterAssignmentAPI(e *echo.Echo, conf config.Config) {
 	db := database.InitDB(conf)
 	repo := repository.NewAssignmentMentorRepository(db)
+	uRepo := repository.NewAssignmentUseerRepository(db)
 	svc := service.NewAssignmentMentorService(repo)
+	uSvc := service.NewAssignmentUserService(uRepo)
 
 	cont := assignment.AssignmentMentorController{
 		Service: svc,
+	}
+
+	uCont := assignment.AssignmentUserController{
+		Service:  uSvc,
+		MService: svc,
 	}
 
 	//----mentor
@@ -338,4 +345,13 @@ func RegisterAssignmentAPI(e *echo.Echo, conf config.Config) {
 	assignmentMentor.DELETE("/delete/:id", cont.DeleteAssignment)
 	assignmentMentor.GET("/:id", cont.GetAssignment)
 
+	//----user
+	assignmentUser := e.Group("/user/assignment",
+		middleware.Logger(),
+		middleware.CORS(),
+	)
+	assignmentUser.Use(middleware.JWT([]byte(conf.JWT_KEY)))
+
+	assignmentUser.GET("/:id", uCont.GetAssignmentByID)
+	assignmentUser.POST("/create/:am_id", uCont.CreateAssignment)
 }
