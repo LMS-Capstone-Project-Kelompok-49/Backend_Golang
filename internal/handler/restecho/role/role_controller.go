@@ -11,7 +11,7 @@ import (
 )
 
 type RoleController struct {
-	service domain.RoleService
+	Service domain.RoleService
 }
 
 func (rc *RoleController) CreateRole(c echo.Context) error {
@@ -29,7 +29,7 @@ func (rc *RoleController) CreateRole(c echo.Context) error {
 	role := model.Role{}
 	c.Bind(&role)
 
-	rescode, err := rc.service.Store(role)
+	rescode, err := rc.Service.Store(role)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -60,7 +60,7 @@ func (rc *RoleController) EditRole(c echo.Context) error {
 	role := model.Role{}
 	c.Bind(&role)
 
-	err := rc.service.Edit(id, role)
+	err := rc.Service.Edit(id, role)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"messages": "no id or no change or unauthorization",
@@ -87,7 +87,7 @@ func (rc *RoleController) DeleteRole(c echo.Context) error {
 
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	err := rc.service.Delete(id)
+	err := rc.Service.Delete(id)
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
@@ -104,7 +104,7 @@ func (rc *RoleController) DeleteRole(c echo.Context) error {
 func (rc *RoleController) GetRole(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	res, err := rc.service.GetOneRole(id)
+	res, err := rc.Service.GetOneRole(id)
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{

@@ -2,11 +2,11 @@ package restecho
 
 import (
 	"fmt"
-	"io"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/bucket"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/domain"
@@ -17,8 +17,8 @@ import (
 )
 
 type MaterialController struct {
-	service       domain.MaterialService
-	courseService domain.CourseService
+	Service       domain.MaterialService
+	CourseService domain.CourseService
 }
 
 func (mc *MaterialController) CreateMaterial(c echo.Context) error {
@@ -26,102 +26,68 @@ func (mc *MaterialController) CreateMaterial(c echo.Context) error {
 	courseid, _ := strconv.Atoi(c.Param("courseid"))
 	c.Bind(&material)
 
+	data, err := mc.CourseService.GetOneCourse(courseid)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": fmt.Sprintf("no course with id %d", courseid),
+		})
+	}
+
 	//cek mentor
-	// mentor, err := mc.courseService.GetOneCourse(courseid)
-	// bearer := c.Get("user").(*jwt.Token)
-	// claim := bearer.Claims.(jwt.MapClaims)
+	bearer := c.Get("user").(*jwt.Token)
+	claim := bearer.Claims.(jwt.MapClaims)
 
-	// if err != nil {
-	// 	return c.JSON(http.StatusNotFound, map[string]interface{}{
-	// 		"messages": "no id or no change or unauthorization",
-	// 	})
-	// }
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": "no id or no change or unauthorization",
+		})
+	}
 
-	// if mentor.MentorID != int(claim["id"].(float64)) {
-	// 	return c.JSON(http.StatusUnauthorized, map[string]interface{}{
-	// 		"messages": "unauthorized",
-	// 		"status":   http.StatusUnauthorized,
-	// 	})
-	// }
+	if data.MentorID != int(claim["id"].(float64)) {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"messages": "unauthorized",
+			"status":   http.StatusUnauthorized,
+		})
+	}
+
+	currentTime := time.Now().Format("2006#01#02#15#04#05")
+	code := strings.ReplaceAll(currentTime, "#", "")
 
 	video, err := c.FormFile("video")
 	if err != nil {
 		material.Video = ""
 	} else {
-		vidSrc, err := video.Open()
+		url, err := bucket.Open(video, "video", fmt.Sprintf("vid_c%d_%s", courseid, code))
 		if err != nil {
-			return fmt.Errorf("error")
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"messages": "error upload file",
+			})
 		}
 
-		vidPath := filepath.Join("temp", video.Filename)
-
-		vidDst, err := os.Create(vidPath)
-		if err != nil {
-			return fmt.Errorf("error")
-		}
-
-		if _, err := io.Copy(vidDst, vidSrc); err != nil {
-			return fmt.Errorf("error")
-		}
-
-		if videoUrl, err := bucket.UploadFile(video.Filename, vidPath, "video"); err != nil {
-			return fmt.Errorf("error")
-		} else {
-			vidSrc.Close()
-			vidDst.Close()
-
-			material.Video = videoUrl
-
-			err := os.Remove(vidPath)
-			if err != nil {
-				return err
-			}
-		}
+		material.Video = url
 	}
 	ppt, err := c.FormFile("ppt")
 	if err != nil {
 		material.PPT = ""
 	} else {
-		pptSrc, err := ppt.Open()
+		url, err := bucket.Open(ppt, "ppt", fmt.Sprintf("ppt_c%d_%s", courseid, code))
 		if err != nil {
-			return fmt.Errorf("error")
-		}
-		defer pptSrc.Close()
-
-		pptPath := filepath.Join("temp", ppt.Filename)
-
-		pptDst, err := os.Create(pptPath)
-		if err != nil {
-			return fmt.Errorf("error")
-		}
-		defer pptDst.Close()
-
-		if _, err := io.Copy(pptDst, pptSrc); err != nil {
-			return fmt.Errorf("error")
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"messages": "error upload file",
+			})
 		}
 
-		if pptUrl, err := bucket.UploadFile(ppt.Filename, pptPath, "ppt"); err != nil {
-			return fmt.Errorf("error")
-		} else {
-			pptSrc.Close()
-			pptDst.Close()
-
-			material.PPT = pptUrl
-
-			err := os.Remove(pptPath)
-			if err != nil {
-				return err
-			}
-		}
+		material.PPT = url
 	}
 
 	material.CourseID = courseid
 
-	rescode, err := mc.service.Store(material)
+	rescode, err := mc.Service.Store(material)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"messages": err.Error(),
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"messages": "error tambah material",
 			"status":   rescode,
 		})
 	}
@@ -135,7 +101,7 @@ func (mc *MaterialController) CreateMaterial(c echo.Context) error {
 func (mc *MaterialController) EditMaterial(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	data, err := mc.service.GetOneMaterial(id)
+	data, err := mc.Service.GetOneMaterial(id)
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
@@ -146,9 +112,11 @@ func (mc *MaterialController) EditMaterial(c echo.Context) error {
 
 	//cek mentor
 	courseid := data.CourseID
-	mentor, err := mc.courseService.GetOneCourse(courseid)
+
 	bearer := c.Get("user").(*jwt.Token)
 	claim := bearer.Claims.(jwt.MapClaims)
+
+	mentor, err := mc.CourseService.GetOneCourse(courseid)
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
@@ -156,7 +124,7 @@ func (mc *MaterialController) EditMaterial(c echo.Context) error {
 		})
 	}
 
-	if mentor.MentorID != int(claim["id"].(float64)) {
+	if mentor.Mentor.UserID != int(claim["id"].(float64)) {
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
 			"messages": "unauthorized",
 			"status":   http.StatusUnauthorized,
@@ -166,95 +134,40 @@ func (mc *MaterialController) EditMaterial(c echo.Context) error {
 	material := model.Material{}
 	c.Bind(&material)
 
+	currentTime := time.Now().Format("2006#01#02#15#04#05")
+	code := strings.ReplaceAll(currentTime, "#", "")
+
 	video, err := c.FormFile("video")
 	if err != nil {
 		material.Video = ""
 	} else {
-		vidSrc, err := video.Open()
+		url, err := bucket.Open(video, "video", fmt.Sprintf("vid_c%d_%s", courseid, code))
 		if err != nil {
-			return fmt.Errorf("error")
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"messages": "error upload file",
+			})
 		}
 
-		vidPath := filepath.Join("temp", video.Filename)
-
-		vidDst, err := os.Create(vidPath)
-		if err != nil {
-			return fmt.Errorf("error")
-		}
-
-		if _, err := io.Copy(vidDst, vidSrc); err != nil {
-			return fmt.Errorf("error")
-		}
-
-		if videoUrl, err := bucket.UploadFile(video.Filename, vidPath, "video"); err != nil {
-			return fmt.Errorf("error")
-		} else {
-			vidSrc.Close()
-			vidDst.Close()
-
-			_, fname := filepath.Split(data.Video)
-
-			err := bucket.RemoveFile(fname, "video")
-			if err != nil {
-				return err
-			}
-
-			material.Video = videoUrl
-
-			err = os.Remove(vidPath)
-			if err != nil {
-				return err
-			}
-		}
+		material.Video = url
 	}
 	ppt, err := c.FormFile("ppt")
 	if err != nil {
 		material.PPT = ""
 	} else {
-		pptSrc, err := ppt.Open()
+		url, err := bucket.Open(ppt, "ppt", fmt.Sprintf("ppt_c%d_%s", courseid, code))
 		if err != nil {
-			return fmt.Errorf("error")
-		}
-		defer pptSrc.Close()
-
-		pptPath := filepath.Join("temp", ppt.Filename)
-
-		pptDst, err := os.Create(pptPath)
-		if err != nil {
-			return fmt.Errorf("error")
-		}
-		defer pptDst.Close()
-
-		if _, err := io.Copy(pptDst, pptSrc); err != nil {
-			return fmt.Errorf("error")
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"messages": "error upload file",
+			})
 		}
 
-		if pptUrl, err := bucket.UploadFile(ppt.Filename, pptPath, "ppt"); err != nil {
-			return fmt.Errorf("error")
-		} else {
-			pptSrc.Close()
-			pptDst.Close()
-
-			_, fname := filepath.Split(data.PPT)
-
-			err := bucket.RemoveFile(fname, "ppt")
-			if err != nil {
-				return err
-			}
-
-			material.PPT = pptUrl
-
-			err = os.Remove(pptPath)
-			if err != nil {
-				return err
-			}
-		}
+		material.PPT = url
 	}
 
 	// bearer := c.Get("user").(*jwt.Token)
 	// claim := bearer.Claims.(jwt.MapClaims)
 
-	err1 := mc.service.Edit(id, material)
+	err1 := mc.Service.Edit(id, material)
 	if err1 != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"messages": "no id or no change or unauthorization",
@@ -269,14 +182,14 @@ func (mc *MaterialController) EditMaterial(c echo.Context) error {
 func (mc *MaterialController) DeleteMaterial(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	data, err := mc.service.GetOneMaterial(id)
+	data, err := mc.Service.GetOneMaterial(id)
 	if err != nil {
 		return err
 	}
 
 	//cek mentor
 	courseid := data.CourseID
-	mentor, err := mc.courseService.GetOneCourse(courseid)
+	mentor, err := mc.CourseService.GetOneCourse(courseid)
 	bearer := c.Get("user").(*jwt.Token)
 	claim := bearer.Claims.(jwt.MapClaims)
 
@@ -286,7 +199,7 @@ func (mc *MaterialController) DeleteMaterial(c echo.Context) error {
 		})
 	}
 
-	if mentor.MentorID != int(claim["id"].(float64)) {
+	if mentor.Mentor.UserID != int(claim["id"].(float64)) {
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
 			"messages": "unauthorized",
 			"status":   http.StatusUnauthorized,
@@ -312,7 +225,7 @@ func (mc *MaterialController) DeleteMaterial(c echo.Context) error {
 	// bearer := c.Get("user").(*jwt.Token)
 	// claim := bearer.Claims.(jwt.MapClaims)
 
-	err = mc.service.Delete(id)
+	err = mc.Service.Delete(id)
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
@@ -328,7 +241,14 @@ func (mc *MaterialController) DeleteMaterial(c echo.Context) error {
 
 func (mc *MaterialController) GetMaterials(c echo.Context) error {
 	courseid, _ := strconv.Atoi(c.Param("courseid"))
-	materials := mc.service.GetAllByCourseID(courseid)
+	materials, err := mc.Service.GetAllByCourseID(courseid)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": "no id or deleted",
+		})
+	}
+
 	return c.JSONPretty(http.StatusOK, map[string]interface{}{
 		"messages":  "success",
 		"materials": materials,
@@ -337,7 +257,8 @@ func (mc *MaterialController) GetMaterials(c echo.Context) error {
 
 func (mc *MaterialController) GetMaterial(c echo.Context) error {
 	id, _ := strconv.Atoi(c.Param("id"))
-	res, err := mc.service.GetOneMaterial(id)
+
+	res, err := mc.Service.GetOneMaterial(id)
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
@@ -347,6 +268,6 @@ func (mc *MaterialController) GetMaterial(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"messages": "success",
-		"users":    res,
+		"material": res,
 	})
 }

@@ -11,7 +11,7 @@ import (
 )
 
 type EchoController struct {
-	svc domain.UserAdapterService
+	Svc domain.UserAdapterService
 }
 
 // Get one godoc
@@ -28,7 +28,7 @@ func (ce *EchoController) CreateUserController(c echo.Context) error {
 	c.Bind(&user)
 	user.RoleID = 2
 
-	err, statusCode := ce.svc.CreateUserService(user)
+	err, statusCode := ce.Svc.CreateUserService(user)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -65,7 +65,7 @@ func (ce *EchoController) UpdateUserController(c echo.Context) error {
 		})
 	}
 
-	err := ce.svc.UpdateUserService(intID, user)
+	err := ce.Svc.UpdateUserService(intID, user)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"messages": "no id or no change or unauthorization",
@@ -94,7 +94,7 @@ func (ce *EchoController) DeleteUserController(c echo.Context) error {
 		})
 	}
 
-	err := ce.svc.DeleteByID(intID)
+	err := ce.Svc.DeleteByID(intID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"messages": "no id or no delete",
@@ -110,7 +110,7 @@ func (ce *EchoController) GetUserController(c echo.Context) error {
 	id := c.Param("user_id")
 	intID, _ := strconv.Atoi(id)
 
-	res, err := ce.svc.GetUserByID(intID)
+	res, err := ce.Svc.GetUserByID(intID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"messages": "no id or no delete",
@@ -124,7 +124,7 @@ func (ce *EchoController) GetUserController(c echo.Context) error {
 }
 
 func (ce *EchoController) GetUsersController(c echo.Context) error {
-	users := ce.svc.GetAllUsersService()
+	users := ce.Svc.GetAllUsersService()
 
 	return c.JSONPretty(http.StatusOK, map[string]interface{}{
 		"messages": "success",
@@ -137,7 +137,7 @@ func (ce *EchoController) LoginUserController(c echo.Context) error {
 
 	c.Bind(&userLogin)
 
-	token, statusCode := ce.svc.LoginUser(userLogin["email"].(string), userLogin["password"].(string))
+	token, statusCode := ce.Svc.LoginUser(userLogin["email"].(string), userLogin["password"].(string))
 	switch statusCode {
 	case http.StatusUnauthorized:
 		return c.JSONPretty(http.StatusBadRequest, map[string]interface{}{

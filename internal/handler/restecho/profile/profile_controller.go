@@ -11,7 +11,7 @@ import (
 )
 
 type ProfileController struct {
-	service domain.ProfileService
+	Service domain.ProfileService
 }
 
 func (pc *ProfileController) CreateProfile(c echo.Context) error {
@@ -22,7 +22,7 @@ func (pc *ProfileController) CreateProfile(c echo.Context) error {
 	claim := bearer.Claims.(jwt.MapClaims)
 	profile.UserID = int(claim["id"].(float64))
 
-	rescode, err := pc.service.Store(profile)
+	rescode, err := pc.Service.Store(profile)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -46,7 +46,7 @@ func (pc *ProfileController) EditProfile(c echo.Context) error {
 
 	user_id := int(claim["id"].(float64))
 
-	err := pc.service.Edit(user_id, profile)
+	err := pc.Service.Edit(user_id, profile)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{
 			"messages": "no id or no change or unauthorization",
@@ -63,7 +63,7 @@ func (pc *ProfileController) GetProfile(c echo.Context) error {
 	claim := bearer.Claims.(jwt.MapClaims)
 
 	user_id := int(claim["id"].(float64))
-	res, err := pc.service.GetProfile(user_id)
+	res, err := pc.Service.GetProfile(user_id)
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]interface{}{

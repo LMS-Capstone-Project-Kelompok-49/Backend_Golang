@@ -23,13 +23,17 @@ func (ms *materialService) Edit(id int, material model.Material) error {
 }
 
 // GetAllByCourseID implements domain.MaterialService
-func (ms *materialService) GetAllByCourseID(courseid int) []model.Material {
+func (ms *materialService) GetAllByCourseID(courseid int) (materials []model.Material, err error) {
 	return ms.repo.GetAll(courseid)
 }
 
 // GetOneCourse implements domain.MaterialService
 func (ms *materialService) GetOneMaterial(id int) (model.Material, error) {
-	return ms.repo.GetByID(id)
+	res, err := ms.repo.GetByID(id)
+	if err != nil {
+		return res, err
+	}
+	return res, nil
 }
 
 // Store implements domain.MaterialService
