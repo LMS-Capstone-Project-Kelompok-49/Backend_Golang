@@ -140,6 +140,63 @@ func (cc *UserCourseController) GetByID(c echo.Context) error {
 	})
 }
 
+func (cc *UserCourseController) Dashboard(c echo.Context) error {
+	courses := []UserDashboardCourse{}
+	asResp := []AssignmentResponseDash{}
+	data := UserDashboardResponse{}
+
+	bearer := c.Get("user").(*jwt.Token)
+	claim := bearer.Claims.(jwt.MapClaims)
+	user_id := int(claim["id"].(float64))
+
+	res, err := cc.EService.GetAllByUser(user_id)
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"messages": "error",
+			"reason":   err,
+		})
+	}
+
+	for i := range res {
+		course, _ := cc.Service.GetOneCourse(res[i].CourseID)
+
+		totalMember := len(course.Student)
+		totalMaterial := len(course.Material)
+
+		progress := (float64(res[i].Progress) / float64(totalMaterial)) * 100
+
+		udc := UserDashboardCourse{
+			TotalMember:   totalMember,
+			TotalMaterial: totalMaterial,
+			Progress:      int(progress),
+		}
+
+		courses = append(courses, getUserCourse(course, udc))
+
+		catId := course.CourseDetail.CategoryID
+
+		catData := cc.CatService.GetOneCategory(catId)
+
+		for j := range course.Assignment {
+			asData := AssignmentResponseDash{
+				AssignmentMentorID: course.Assignment[j].AssignmentMentorID,
+				Title:              course.Assignment[j].Title,
+				CourseName:         course.CourseName,
+				CoursCategory:      catData.Category,
+			}
+			asResp = append(asResp, asData)
+		}
+	}
+
+	data = getUserDash(courses, asResp)
+
+	return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		"messages": "berhasil",
+		"data":     data,
+	})
+}
+
 func (cc *UserCourseController) Update(c echo.Context) error {
 	bearer := c.Get("user").(*jwt.Token)
 	claim := bearer.Claims.(jwt.MapClaims)
@@ -159,5 +216,34 @@ func (cc *UserCourseController) Update(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"messages": "berhasil",
+	})
+}
+
+func (cc *UserCourseController) GetHistory(c echo.Context) error {
+	bearer := c.Get("user").(*jwt.Token)
+	claim := bearer.Claims.(jwt.MapClaims)
+	user_id := int(claim["id"].(float64))
+
+	res, err := cc.EService.GetAllByUser(user_id)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": "error",
+			"reason":   err,
+		})
+	}
+
+	courses := []model.Course{}
+	data := HistoryResp{}
+
+	for i := range res {
+		if res[i].Status == "complete" {
+			course, _ := cc.Service.GetOneCourse(res[i].CourseID)
+			courses = append(courses, course)
+		}
+	}
+	data.Course = courses
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"messages": "berhasil",
+		"data":     data,
 	})
 }

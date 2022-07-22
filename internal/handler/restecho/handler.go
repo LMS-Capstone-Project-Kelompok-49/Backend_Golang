@@ -116,6 +116,7 @@ func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
 
 	usrDash.GET("/course", eCont.GetAll)
 	usrDash.GET("/course/:course_id", eCont.GetByID)
+	usrDash.GET("/dashboard", eCont.Dashboard)
 }
 
 func RegisterRoleGroupAPI(e *echo.Echo, conf config.Config) {
@@ -289,7 +290,8 @@ func RegisterRatingAPI(e *echo.Echo, conf config.Config) {
 	repo := repository.NewRatingRepository(db)
 	prepo := repository.NewProfileRepository(db)
 	cRepo := repository.NewCourseRepository(db)
-	svc := service.NewRatingService(repo)
+	eRepo := repository.NewEnrollmentRepository(db)
+	svc := service.NewRatingService(repo, eRepo)
 	cSvc := service.NewCourseService(cRepo, prepo)
 
 	cont := rating.RatingController{

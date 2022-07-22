@@ -6,6 +6,22 @@ import (
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/model"
 )
 
+type HistoryResp struct {
+	Course []model.Course
+}
+
+type UserDashboardResponse struct {
+	MyCourse    []UserDashboardCourse    `json:"mycourse"`
+	Progress    ProgressResponse         `json:"progress"`
+	Assignments []AssignmentResponseDash `json:"assignments"`
+}
+
+type ProgressResponse struct {
+	Reading    int `json:"reading"`
+	Listening  int `json:"listening"`
+	Assignment int `json:"assignment"`
+}
+
 type MentorResponse struct {
 	Name string `json:"name"`
 	// Job         string `json:"job"`
@@ -17,6 +33,13 @@ type MaterialResponse struct {
 	Description string `json:"description"`
 	Video       string `json:"video"`
 	PPT         string `json:"ppt"`
+}
+
+type AssignmentResponseDash struct {
+	AssignmentMentorID int    `json:"assigment_id"`
+	Title              string `json:"title"`
+	CourseName         string `json:"course_name"`
+	CoursCategory      string `json:"course_category"`
 }
 
 type AssignmentResponse struct {
@@ -171,5 +194,17 @@ func getAssignment(model model.AssignmentMentor) AssignmentResponse {
 		Intruction:         model.Intruction,
 		Refference:         model.Refference,
 		Point:              model.Point,
+	}
+}
+
+func getUserDash(udc []UserDashboardCourse, ar []AssignmentResponseDash) UserDashboardResponse {
+	return UserDashboardResponse{
+		MyCourse: udc,
+		Progress: ProgressResponse{
+			Listening:  99,
+			Reading:    99,
+			Assignment: 99,
+		},
+		Assignments: ar,
 	}
 }

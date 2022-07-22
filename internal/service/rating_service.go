@@ -10,7 +10,8 @@ import (
 )
 
 type ratingService struct {
-	repo domain.RatingRepository
+	repo  domain.RatingRepository
+	eRepo domain.EnrollmenRepository
 }
 
 // Edit implements domain.RatingService
@@ -35,9 +36,22 @@ func (rs *ratingService) Remove(id int) error {
 
 // Store implements domain.RatingService
 func (rs *ratingService) Store(rating model.Rating) error {
+	enrollment := model.Enrollment{}
 
 	id := rating.UserID
 	course_id := rating.CourseID
+
+	enr, _ := rs.eRepo.GetByUser(id)
+
+	for i := range enr {
+		if enr[i].CourseID == course_id {
+			enrollment = enr[i]
+		}
+	}
+
+	if enrollment.Status != "complete" {
+		return fmt.Errorf("selesaikain course dulu")
+	}
 
 	log.Println(id)
 
@@ -59,8 +73,9 @@ func (rs *ratingService) Store(rating model.Rating) error {
 	return rs.repo.Create(rating)
 }
 
-func NewRatingService(repo domain.RatingRepository) domain.RatingService {
+func NewRatingService(repo domain.RatingRepository, eRepo domain.EnrollmenRepository) domain.RatingService {
 	return &ratingService{
-		repo: repo,
+		repo:  repo,
+		eRepo: eRepo,
 	}
 }
