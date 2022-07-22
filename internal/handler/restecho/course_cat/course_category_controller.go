@@ -11,7 +11,7 @@ import (
 )
 
 type CourseCategoryController struct {
-	service domain.CourseCategoryService
+	Service domain.CourseCategoryService
 }
 
 func (cc *CourseCategoryController) CreateCourseCategory(c echo.Context) error {
@@ -33,7 +33,7 @@ func (cc *CourseCategoryController) CreateCourseCategory(c echo.Context) error {
 	// claim := bearer.Claims.(jwt.MapClaims)
 	// course.MentorID = int(claim["id"].(float64))
 
-	rescode, err := cc.service.Store(course)
+	rescode, err := cc.Service.Store(course)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -51,14 +51,14 @@ func (cc *CourseCategoryController) CreateCourseCategory(c echo.Context) error {
 func (cc *CourseCategoryController) GetCourseCategory(c echo.Context) error {
 	id := c.Param("course_category_id")
 	intID, _ := strconv.Atoi(id)
-	courses := cc.service.GetOneCategory(intID)
+	courses := cc.Service.GetOneCategory(intID)
 	return c.JSONPretty(http.StatusOK, map[string]interface{}{
 		"messages": "success",
 		"users":    courses,
 	}, "  ")
 }
 func (cc *CourseCategoryController) GetCoursesCategory(c echo.Context) error {
-	courses := cc.service.GetAllCategory()
+	courses := cc.Service.GetAllCategory()
 	return c.JSONPretty(http.StatusOK, map[string]interface{}{
 		"messages": "success",
 		"users":    courses,

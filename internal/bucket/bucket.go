@@ -11,9 +11,14 @@ import (
 
 func InitMinio() *minio.Client {
 	ctx := context.Background()
-	endpoint := "35.174.174.120:9000"
-	accessKeyID := "admin-capstone"
-	secretAccessKey := "SemogaLancar12345"
+	// endpoint := "35.174.174.120:9000"
+	// accessKeyID := "admin-capstone"
+	// secretAccessKey := "SemogaLancar12345"
+
+	endpoint := "192.168.127.217:9000"
+	accessKeyID := "minioadmin"
+	secretAccessKey := "minioadmin"
+
 	useSSL := false
 
 	// Initialize minio client object.
@@ -57,55 +62,55 @@ func InitMinio() *minio.Client {
 		log.Printf("Successfully created %s\n", pptBucket)
 	}
 
+	courseAvatar := "avatar"
+
+	err = minioClient.MakeBucket(ctx, courseAvatar, minio.MakeBucketOptions{})
+	if err != nil {
+		// Check to see if we already own this bucket (which happens if you run this twice)
+		exists, errBucketExists := minioClient.BucketExists(ctx, courseAvatar)
+		if errBucketExists == nil && exists {
+			log.Printf("We already own %s\n", courseAvatar)
+		} else {
+			log.Fatalln(err)
+		}
+	} else {
+		log.Printf("Successfully created %s\n", courseAvatar)
+	}
+
+	mediaBucket := "media"
+
+	err = minioClient.MakeBucket(ctx, mediaBucket, minio.MakeBucketOptions{})
+	if err != nil {
+		// Check to see if we already own this bucket (which happens if you run this twice)
+		exists, errBucketExists := minioClient.BucketExists(ctx, mediaBucket)
+		if errBucketExists == nil && exists {
+			log.Printf("We already own %s\n", mediaBucket)
+		} else {
+			log.Fatalln(err)
+		}
+	} else {
+		log.Printf("Successfully created %s\n", mediaBucket)
+	}
+
 	return minioClient
 }
 
 func UploadFile(fileName string, filePath string, fileType string) (url string, err error) {
 	ctx := context.Background()
-	// endpoint := "192.168.1.9:9000"
-	// accessKeyID := "minioadmin"
-	// secretAccessKey := "minioadmin"
-	// useSSL := false
-
-	// // Initialize minio client object.
-	// minioClient, err := minio.New(endpoint, &minio.Options{
-	// 	Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
-	// 	Secure: useSSL,
-	// })
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
 
 	minioClient := InitMinio()
 
-	if fileType == "video" {
-		//up
-		info, err := minioClient.FPutObject(ctx, fileType, fileName, filePath, minio.PutObjectOptions{})
-		if err != nil {
-			log.Fatalln(err)
-		}
-		log.Print(info)
-		log.Printf("Successfully uploaded %s of size %d\n", fileName, info.Size)
-
-		vidUrl := fmt.Sprintf("%s/%s/%s", minioClient.EndpointURL(), fileType, fileName)
-		return vidUrl, nil
+	//up
+	info, err := minioClient.FPutObject(ctx, fileType, fileName, filePath, minio.PutObjectOptions{})
+	if err != nil {
+		log.Fatalln(err)
 	}
+	log.Print(info)
+	log.Printf("Successfully uploaded %s of size %d\n", fileName, info.Size)
 
-	if fileType == "ppt" {
+	fileUrl := fmt.Sprintf("%s/%s/%s", minioClient.EndpointURL(), fileType, fileName)
+	return fileUrl, nil
 
-		//up
-		info, err := minioClient.FPutObject(ctx, fileType, fileName, filePath, minio.PutObjectOptions{})
-		if err != nil {
-			log.Fatalln(err)
-		}
-		log.Print(info)
-		log.Printf("Successfully uploaded %s of size %d\n", fileName, info.Size)
-
-		pptUrl := fmt.Sprintf("%s/%s/%s", minioClient.EndpointURL(), fileType, fileName)
-
-		return pptUrl, nil
-	}
-	return "", nil
 }
 
 func RemoveFile(fileName string, fileType string) error {

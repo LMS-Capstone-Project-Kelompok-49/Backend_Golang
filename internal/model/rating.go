@@ -7,12 +7,12 @@ import (
 )
 
 type Rating struct {
-	CreatedAt    time.Time      `json:"-"`
-	UpdatedAt    time.Time      `json:"-"`
-	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
-	MaterialID   int            `gorm:"primary_key ; AUTO_INCREMENT" json:"-"`
-	CourseID     int            `json:"-"`
-	MaterialName string         `json:"materialname" form:"materialname"`
-	PPT          string         `json:"ppt" form:"ppt"`
-	Video        string         `json:"video" form:"video"`
+	CreatedAt time.Time      `json:"-"`
+	UpdatedAt time.Time      `json:"-"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+	RatingID  int            `gorm:"primary_key ; AUTO_INCREMENT" json:"-"`
+	CourseID  int            `json:"-"`
+	UserID    int            `json:"-"`
+	Rating    float64        `json:"rating" form:"rating"`
+	Review    string         `json:"review" form:"review"`
 }

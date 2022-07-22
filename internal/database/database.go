@@ -40,18 +40,8 @@ func InitDB(conf config.Config) *gorm.DB {
 	DB.Create(&model.User{
 		RoleID:   1,
 		UserID:   1,
-		Name:     "Admin",
 		Email:    "Admin",
 		Password: "Admin",
-	})
-
-	DB.Create(&model.CourseType{
-		CourseTypeID: 1,
-		CourseType:   "Lifetime",
-	})
-	DB.Create(&model.CourseType{
-		CourseTypeID: 2,
-		CourseType:   "Bootcamp",
 	})
 
 	DB.Create(&model.CourseCategory{
@@ -63,13 +53,23 @@ func InitDB(conf config.Config) *gorm.DB {
 		Category:         "Mobile",
 	})
 
+	DB.Create(&model.CourseCategory{
+		CourseCategoryID: 99,
+		Category:         "Other",
+	})
+
 	DB.AutoMigrate(
 		&model.User{},
+		&model.UserProfile{},
 		&model.Role{},
 		&model.Course{},
-		&model.CourseCategory{},
-		&model.CourseType{},
 		&model.Material{},
+		&model.CourseCategory{},
+		&model.CourseDetail{},
+		&model.Rating{},
+		&model.Enrollment{},
+		&model.AssignmentMentor{},
+		&model.AssignmentUser{},
 	)
 	return DB
 }

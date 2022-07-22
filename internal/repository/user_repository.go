@@ -23,13 +23,13 @@ func (r *repositoryMysqlLayer) CreateUsers(user model.User) error {
 
 func (r *repositoryMysqlLayer) GetAll() []model.User {
 	users := []model.User{}
-	r.DB.Find(&users)
+	r.DB.Preload("Profile").Find(&users)
 
 	return users
 }
 
 func (r *repositoryMysqlLayer) GetOneByID(id int) (user model.User, err error) {
-	res := r.DB.Where("user_id = ?", id).Find(&user)
+	res := r.DB.Where("user_id = ?", id).Preload("Profile").Preload("Enrollment").Find(&user)
 	if res.RowsAffected < 1 {
 		err = fmt.Errorf("not found")
 	}

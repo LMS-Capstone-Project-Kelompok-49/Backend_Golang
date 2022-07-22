@@ -49,7 +49,7 @@ func (s *svcUser) LoginUser(email, password string) (string, int) {
 	}
 	user, _ := s.repo.GetOneByEmail(email)
 
-	if (user.Password != password) || (user == model.User{}) {
+	if (user.Password != password) && (user.Email != email) {
 		return "", http.StatusUnauthorized
 	}
 

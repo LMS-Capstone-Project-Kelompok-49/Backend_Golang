@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/domain"
 	"github.com/LMS-Capstone-Project-Kelompok-49/Backend-Golang/internal/model"
@@ -14,6 +15,8 @@ type materialRepoLayer struct {
 
 // Create implements domain.MaterialRepository
 func (mr *materialRepoLayer) Create(material model.Material) error {
+	re := mr.DB.Model(&model.Course{}).Association("CourseID")
+	log.Println(re)
 	res := mr.DB.Create(&material)
 	if res.RowsAffected < 1 {
 		return fmt.Errorf("error create material")
@@ -33,20 +36,21 @@ func (mr *materialRepoLayer) Delete(id int) error {
 }
 
 // GetAll implements domain.MaterialRepository
-func (mr *materialRepoLayer) GetAll(courseid int) []model.Material {
-	materials := []model.Material{}
-	mr.DB.Where("course_id = ?", courseid).Find(&materials)
-
-	return materials
+func (mr *materialRepoLayer) GetAll(courseid int) (materials []model.Material, err error) {
+	res := mr.DB.Where("course_id = ?", courseid).Find(&materials)
+	if res.RowsAffected < 1 {
+		return materials, fmt.Errorf("error delete material")
+	}
+	return materials, nil
 }
 
 // GetByID implements domain.MaterialRepository
 func (mr *materialRepoLayer) GetByID(id int) (material model.Material, err error) {
-	res := mr.DB.Where("material_id = ?", id).First(&material)
-	if res.RowsAffected < 1 {
-		err = fmt.Errorf("not found")
+	err = mr.DB.Where("material_id = ?", id).First(&material).Error
+	if err != nil {
+		return material, fmt.Errorf("not found")
 	}
-	return
+	return material, nil
 }
 
 // Update implements domain.MaterialRepository
