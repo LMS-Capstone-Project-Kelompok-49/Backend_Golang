@@ -93,8 +93,9 @@ func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
 	//------------------ user
 
 	eCont := course.UserCourseController{
-		Service:  svc,
-		EService: eSvc,
+		Service:    svc,
+		EService:   eSvc,
+		CatService: catSvc,
 	}
 
 	enrCourse := e.Group("/enrollment",
@@ -113,7 +114,8 @@ func RegisterCourseGroupAPI(e *echo.Echo, conf config.Config) {
 	)
 	usrDash.Use(middleware.JWT([]byte(conf.JWT_KEY)))
 
-	usrDash.GET("/course", eCont.GetByID)
+	usrDash.GET("/course", eCont.GetAll)
+	usrDash.GET("/course/:course_id", eCont.GetByID)
 }
 
 func RegisterRoleGroupAPI(e *echo.Echo, conf config.Config) {
@@ -319,8 +321,11 @@ func RegisterAssignmentAPI(e *echo.Echo, conf config.Config) {
 	db := database.InitDB(conf)
 	repo := repository.NewAssignmentMentorRepository(db)
 	uRepo := repository.NewAssignmentUseerRepository(db)
+	cRepo := repository.NewCourseRepository(db)
+	pRepo := repository.NewProfileRepository(db)
 	svc := service.NewAssignmentMentorService(repo)
 	uSvc := service.NewAssignmentUserService(uRepo)
+	cSvc := service.NewCourseService(cRepo, pRepo)
 
 	cont := assignment.AssignmentMentorController{
 		Service: svc,
@@ -329,6 +334,7 @@ func RegisterAssignmentAPI(e *echo.Echo, conf config.Config) {
 	uCont := assignment.AssignmentUserController{
 		Service:  uSvc,
 		MService: svc,
+		CService: cSvc,
 	}
 
 	//----mentor

@@ -14,6 +14,7 @@ import (
 type AssignmentUserController struct {
 	Service  domain.AssignmentUserService
 	MService domain.AssignmentMentorService
+	CService domain.CourseService
 }
 
 func (ac *AssignmentUserController) CreateAssignment(c echo.Context) error {
@@ -101,6 +102,25 @@ func (ac *AssignmentUserController) GetAssignmentByUserID(c echo.Context) error 
 			"message": "no data or deleted",
 		})
 	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "success post assignment",
+		"status":  http.StatusOK,
+		"data":    res,
+	})
+}
+
+func (ac *AssignmentUserController) GetAssignmentByCourse(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	res, err := ac.CService.GetOneCourse(id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "no data or deleted",
+		})
+	}
+
+	
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "success post assignment",

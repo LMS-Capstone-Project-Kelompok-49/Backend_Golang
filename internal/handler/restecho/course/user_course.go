@@ -1,6 +1,7 @@
 package restecho
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -12,8 +13,9 @@ import (
 )
 
 type UserCourseController struct {
-	Service  domain.CourseService
-	EService domain.EnrollmentService
+	Service    domain.CourseService
+	EService   domain.EnrollmentService
+	CatService domain.CourseCategoryService
 }
 
 func (cc *UserCourseController) JoinCourse(c echo.Context) error {
@@ -55,7 +57,7 @@ func (cc *UserCourseController) JoinCourse(c echo.Context) error {
 	})
 }
 
-func (cc *UserCourseController) GetByID(c echo.Context) error {
+func (cc *UserCourseController) GetAll(c echo.Context) error {
 	courses := []UserDashboardCourse{}
 
 	bearer := c.Get("user").(*jwt.Token)
@@ -91,6 +93,50 @@ func (cc *UserCourseController) GetByID(c echo.Context) error {
 	return c.JSON(http.StatusBadRequest, map[string]interface{}{
 		"messages": "berhasil",
 		"data":     courses,
+	})
+}
+
+func (cc *UserCourseController) GetByID(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("course_id"))
+
+	res, err := cc.Service.GetOneCourse(id)
+
+	catId := res.CourseDetail.CategoryID
+
+	catData := cc.CatService.GetOneCategory(catId)
+
+	courseResponse := CourseResponseDash{}
+	courseResponse.Category = catData.Category
+
+	count := 0
+
+	for i := range res.Material {
+		courseResponse.Material = append(courseResponse.Material, getMaterial(res.Material[i]))
+		if res.Material[i].Video != "" {
+			count++
+		}
+	}
+
+	for j := range res.Assignment {
+		courseResponse.Assignment = append(courseResponse.Assignment, getAssignment(res.Assignment[j]))
+	}
+
+	log.Println(courseResponse.Assignment)
+	log.Println(1)
+
+	courseResponse.TotalVideo = count
+	courseResponse.TotalMember = len(res.Student)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"messages": "no id or deleted",
+		})
+	}
+	log.Println(2)
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"messages": "success",
+		"data":     getCourseDash(res, courseResponse),
 	})
 }
 
